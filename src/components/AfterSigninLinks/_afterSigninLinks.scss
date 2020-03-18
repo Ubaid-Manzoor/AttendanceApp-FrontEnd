@@ -1,0 +1,105 @@
+// @import url(https://fonts.googleapis.com/css?family=Open+Sans);
+// .BeforeSigninLinks__wrapper{
+//   display: flex;
+//   flex-direction: column;
+//   margin:3em 0;
+// }
+
+// .a, .a:visited, .a:hover, .a:active{
+//   -webkit-backface-visibility:hidden;
+//           backface-visibility:hidden;
+// 	position:relative;
+//   transition:0.5s color ease;
+// 	text-decoration:none;
+// 	color:#000;
+//   font-size: 1.9rem;
+//   margin-bottom: 0.7rem;
+// }
+
+// .a:hover{
+// 	color:#3f3f3f;
+// }
+
+// .a.after:after{
+//   content: "";
+//   transition:0.5s all ease;
+//   -webkit-backface-visibility:hidden;
+//           backface-visibility:hidden;
+//   position:absolute;
+// }
+
+// .a.after:after{
+//   bottom:-0.32em;
+// }
+
+// .a.after:after{
+//   height:2px;
+//   width:0;
+//   background:#3f3f3f;
+// }
+
+// .a.third:after{
+//   left:50%;
+//   -webkit-transform:translateX(-50%);
+//           transform:translateX(-50%);
+// }
+
+// .a.after:hover:after{
+//   width:100%;
+// }
+
+.after-signin-nav {
+  width: 100;
+  background-color: #37444c;
+  color: #e3e3e3;
+  font-family: 'Quicksand', sans-serif; 
+    font-size: 1.2rem;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+}
+
+
+.user-profile-div {
+  .user-image {
+    display: block;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    padding: 4px;
+    position: relative;
+    cursor: pointer;
+
+      img{
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+        }
+  }
+
+}
+
+.username {
+  text-align: center;
+  margin: 0.2rem auto;
+}
+
+.navigation{
+  margin-top: 1.5rem;
+  .navigation-item {
+    cursor: pointer;
+    display: block;
+    padding: 20px;
+    width: 100%;
+    height: 70px;
+    margin: auto 0;
+  }
+}
+
+.navigation-item:hover {
+  background-color: #1d262b;
+  color: #fff
+}
+
+
