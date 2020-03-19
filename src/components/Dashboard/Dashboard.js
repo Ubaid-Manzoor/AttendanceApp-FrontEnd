@@ -9,13 +9,15 @@ import { getAndSetUser } from '../../actions/user'
 // import { Redirect } from 'react-router-dom';
 
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
+import Cookies from 'universal-cookie';
 class Dashboard extends Component{
 
   constructor(props) {
     super(props);
 
     const logginStatus = this.checkLogginStatus();
-
+    const cookies = new Cookies();
+    console.log(cookies.getAll());
     this.state = {
       logginStatus
     }
@@ -26,6 +28,9 @@ class Dashboard extends Component{
     if(this.state.logginStatus){
       this.props.getSetUser(getUsernameFromCookie());
     }
+    const cookies = new Cookies();
+    console.log(cookies.getAll());
+
   }
 
   checkLogginStatus = () =>{

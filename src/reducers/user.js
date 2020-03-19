@@ -1,17 +1,17 @@
+// import Cookies from "universal-cookie";
+
 // Expenses Reducer
 
 const userReducerDefaultState = {
-  username: undefined,
-  role: undefined,
-  password: undefined
+  username: null,
+  role: null,
+  password: null
 };
 
 export default (state = userReducerDefaultState, action) => {
   switch (action.type) {
     case 'SET_USER':
       const {username,password,role} = action.user;
-      console.log(action)
-      console.log("USRNAME111 " , username);
       return {
         username,
         password,

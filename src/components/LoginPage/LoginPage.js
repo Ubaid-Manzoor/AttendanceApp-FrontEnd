@@ -111,9 +111,11 @@ class LoginPage extends Component{
     ////////////////////SETSTATE CALLBACK END//////////////////////////////
 
     setCookies = (username,role) =>{
+        console.log("Setting Cookies: ",username," ",role)
         const cookies = new Cookies();
         cookies.set("username",username);
         cookies.set("role",role);
+        // console.log(cookies.getAll());
     }
 
 
@@ -141,12 +143,12 @@ class LoginPage extends Component{
                 .then(response => {
                     console.log(response);
                     
-                    const { jwt, message, status } = response.result;
-                    const { _id:username , role } = JwtDecode(jwt); 
-                    console.log(JwtDecode(jwt));
-                    if(status === 200){
+                    const { message, status } = response.result;
+
+                    if(response['status'] === 200){
                         switch(status){
                             case 200:
+                                const { username,role } = response.result.data;
                                 this.setCookies(username,role);
                                 this.props.history.push('/');
                                 break;

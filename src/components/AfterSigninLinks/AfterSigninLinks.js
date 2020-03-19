@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 // import { Redirect } from 'react-router';
 // import jwt from 'jwt-decode';
 
-// import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import './_afterSigninLinks.scss'
 // import JwtDecode from 'jwt-decode';
@@ -32,25 +32,27 @@ class AfterSigninLinks extends Component{
           <div className='navigation'>
             { this.state.userRole === 'student' && 
               <React.Fragment>
-                <a href="/attendance" className='navigation-item'>Attendance</a>
+                <Link to="/attendance" className='navigation-item'>Attendance</Link>
               </React.Fragment>
             }
             { 
               this.state.userRole === 'teacher' &&
               <React.Fragment>
-                <a href="/attendance" className='navigation-item'>Attendance</a>
-                <a href="/message" className="navigation-item">Message</a>
+                <Link to="/attendance" className='navigation-item'>Attendance</Link>
+                <Link to="/message" className="navigation-item">Message</Link>
               </React.Fragment>
             }
             {
               this.state.userRole === 'admin' && 
               <React.Fragment>
-                <a href="/addTeacher" className="navigation-item">Add Teacher</a>
-                <a href="/addStudent" className="navigation-item">Add Student</a>
-                <a href="/message" className="navigation-item">Message</a>
+                <Link to="/addCourse" className="navigation-item">Add Course</Link>
+                <Link to="/addTeacher" className="navigation-item">Add Teacher</Link>
+                <Link to="/addStudent" className="navigation-item">Add Student</Link>
+                <Link to="/showTeachers" className="navigation-item">Show Teachers</Link>
+                <Link to="/message" className="navigation-item">Message</Link>
               </React.Fragment>
             }
-            <a href="/" className='navigation-item' onClick={logout()}>Logout</a>
+            <a href="/" className='navigation-item' onClick={logout}>Logout</a>
           </div>
         </div>
       </div>

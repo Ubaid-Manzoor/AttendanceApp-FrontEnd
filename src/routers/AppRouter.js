@@ -12,6 +12,9 @@ import AddStudentPage from '../components/AddStudentPage';
 import AddTeacherPage from '../components/AddTeacherPage';
 import AttendancePage from '../components/AttendancePage';
 import MessagePage from '../components/MessagePage';
+import AddCoursePage from '../components/AddCoursePage';
+import ShowTeachersPage from '../components/ShowTeachersPage'
+import _404Page from '../components/_404Page';
 import Help from '../components/Help'
 
 const AuthHelp = Authenticate(Help)
@@ -23,7 +26,7 @@ class AppRouter extends Component{
   render() {
     return (
       <BrowserRouter>
-        <div >
+        <div className="fullBody">
           <Sidebar />
           <Switch>
             <Route path="/" component={Dashboard} exact={true} />>
@@ -33,7 +36,10 @@ class AppRouter extends Component{
             <Route path="/attendance" component={ AttendancePage } />
             <Route path="/message" component={ MessagePage } />
             <Route path="/addTeacher" component={ AddTeacherPage } />
-            <Route paht="/addStudent" component={ AddStudentPage } />
+            <Route path="/addStudent" component={ AddStudentPage } />
+            <Route path="/addCourse" component={ AddCoursePage } />
+            <Route path="/showTeachers" component={ ShowTeachersPage } />
+            <Route component={ _404Page }></Route>
           </Switch>
         </div>
       </BrowserRouter>

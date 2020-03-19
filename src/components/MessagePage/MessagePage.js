@@ -4,7 +4,7 @@ class MessagePage extends Component{
     render(){
         return(
             <React.Fragment>
-                <div>
+                <div className="sidePage">
                     <h1>Message Page</h1>
                 </div>
             </React.Fragment>

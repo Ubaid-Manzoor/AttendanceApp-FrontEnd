@@ -22,8 +22,9 @@ export const getAndSetUser = ((username)=>{
         .then(response => response.json())
         .then(data => {
           console.log(data)
-          const { _id:username, password, role} = data;
-          dispatch(setUser(username,password,role))
+          const { _id:name, password, role} = data;
+          console.log("NAME: ",name)
+          dispatch(setUser(name,password,role))
         })
   }
 })
