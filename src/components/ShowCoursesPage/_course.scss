@@ -1,0 +1,29 @@
+.courseBlock{
+    font-family: 'Play', sans-serif;
+    .courseContainer{
+        padding: 1rem 2rem 1rem 2rem;
+        .mainHeader{
+            padding:5rem;
+            text-align: center;
+            background: rosybrown;
+        }
+    }
+}
+
+.mainBody{
+    padding: 2rem 0 0 0;
+    .courseMainDiv{
+        color: brown;
+        .courseData{
+            background-color: seashell;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            header{
+                padding:1rem 0 1rem 0;
+                background-color:blanchedalmond;
+            }
+        }
+    }
+}
+

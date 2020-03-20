@@ -49,6 +49,7 @@ class AfterSigninLinks extends Component{
                 <Link to="/addTeacher" className="navigation-item">Add Teacher</Link>
                 <Link to="/addStudent" className="navigation-item">Add Student</Link>
                 <Link to="/showTeachers" className="navigation-item">Show Teachers</Link>
+                <Link to="/showCourses" className="navigation-item">Show Courses</Link>
                 <Link to="/message" className="navigation-item">Message</Link>
               </React.Fragment>
             }
