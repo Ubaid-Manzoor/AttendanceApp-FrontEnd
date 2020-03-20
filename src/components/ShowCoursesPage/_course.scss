@@ -1,11 +1,14 @@
 .courseBlock{
+    background-color: #ebebeb;
     font-family: 'Play', sans-serif;
     .courseContainer{
         padding: 1rem 2rem 1rem 2rem;
         .mainHeader{
-            padding:5rem;
+            color:#fff;
+            font-size: 2rem;
+            padding:4rem;
             text-align: center;
-            background: rosybrown;
+            background: #333333;
         }
     }
 }
@@ -13,15 +16,19 @@
 .mainBody{
     padding: 2rem 0 0 0;
     .courseMainDiv{
-        color: brown;
+        color: #333333;
         .courseData{
-            background-color: seashell;
-            padding: 2rem;
+            background-color: #ffffff;
+            padding: 0 0 2rem 0;
             margin-bottom: 2rem;
             border-radius: 10px;
             header{
-                padding:1rem 0 1rem 0;
-                background-color:blanchedalmond;
+                color:#fff;
+                padding:1rem 2rem 1rem 2rem;
+                background-color:#333333;
+            }
+            .courseBody{
+                padding:1rem 2rem 1rem 2rem;
             }
         }
     }

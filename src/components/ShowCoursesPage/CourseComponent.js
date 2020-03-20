@@ -10,7 +10,9 @@ const CourseComponent = (props)=>{
                     <header>
                         <h1>{name}</h1>
                     </header>
-                    TeacherAssigned : <h1>{teacherAssigned}</h1>
+                    <div className="courseBody">
+                        TeacherAssigned : <h1>{teacherAssigned}</h1>
+                    </div>
                 </div>
             </div>
         </div>

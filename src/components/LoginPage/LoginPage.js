@@ -26,6 +26,7 @@ class LoginPage extends Component{
                 username: "",
                 password: "",
                 usernameOrPassword: "",
+                unAuthorized: "",
                 otherError: ""
             }
         }
@@ -82,6 +83,7 @@ class LoginPage extends Component{
             username: "",
             password: "",
             usernameOrPassword: "",
+            unAuthorized: "",
             otherError: ""
         })
         this.setState({errorsExists: false});
@@ -153,6 +155,9 @@ class LoginPage extends Component{
                                 this.props.history.push('/');
                                 break;
                             case 401:
+                                this.setErrors({usernameOrPassword: message})
+                                break;
+                            case 403:
                                 this.setErrors({usernameOrPassword: message})
                                 break;
                             default:

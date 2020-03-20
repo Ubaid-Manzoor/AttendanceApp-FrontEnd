@@ -136,7 +136,11 @@ class SignUpPage extends Component{
 
     handleSubmit = (e)=>{
         e.preventDefault();
-        const user_data = {...this.state.signup_data}
+        const user_data = {
+            ...this.state.signup_data,
+            confirmed: false            
+        }
+
 
         this.clearAllErrors();
 

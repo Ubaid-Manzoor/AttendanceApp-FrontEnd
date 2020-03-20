@@ -8,7 +8,7 @@ import configureStore from './store/configureStore';
 //  import 'normalize.css/normalize.css';
 import './styles/styles.scss';
 import './styles/base/_base.scss'
-import Cookies from 'universal-cookie';
+// import Cookies from 'universal-cookie';
 import { getAndSetUser } from '../src/actions/user'
 import { getUsernameFromCookie} from './helperFunction/getCookie';
 
@@ -16,8 +16,8 @@ const store = configureStore();
 store.dispatch(getAndSetUser(getUsernameFromCookie()))
 
 store.subscribe(()=>{
-  const cookies = new Cookies();
-  console.log(cookies.getAll());
+  // const cookies = new Cookies();
+  // console.log(cookies.getAll());
   console.log(store.getState());
 })
 

@@ -13,8 +13,8 @@ import AddTeacherPage from '../components/AddTeacherPage';
 import AttendancePage from '../components/AttendancePage';
 import MessagePage from '../components/MessagePage';
 import AddCoursePage from '../components/AddCoursePage';
-import ShowTeachersPage from '../components/ShowTeachersPage'
 import ShowCoursesPage from '../components/ShowCoursesPage';
+import ShowTeachersPage from '../components/ShowTeachersPage'
 import _404Page from '../components/_404Page';
 import Help from '../components/Help'
 

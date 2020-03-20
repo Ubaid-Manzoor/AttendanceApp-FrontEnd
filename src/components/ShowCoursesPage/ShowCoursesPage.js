@@ -13,16 +13,16 @@ class ShowCoursesPage extends Component {
     }
     
     render(){
-        const listOfCouses = this.props.courses;
+        const listOfCourses = this.props.courses;
         return(
             <div className="courseBlock sidePage">
                 <div className="courseContainer">
                     <header className="mainHeader">
-                        <h1>Show All Course</h1>
+                        <h1>All Course</h1>
                     </header>
                     <header></header>
                     <div className="mainBody">
-                        {listOfCouses.map((course =>{
+                        {listOfCourses.map((course =>{
                             const {name, teacherAssigned } = course;
                             return <CourseComponent key={name} name={name} teacherAssigned={teacherAssigned} />
                         }))}

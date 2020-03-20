@@ -1,3 +1,5 @@
+/////////////////////////// FOR  ALL USERS ////////////////////////////////////
+
 export const setUser = (username,password,role) => ({
   type: 'SET_USER',
   user:{
@@ -28,3 +30,8 @@ export const getAndSetUser = ((username)=>{
         })
   }
 })
+
+
+/////////////////////////////// FOR ALL USERS END ///////////////////////////////////
+
+
