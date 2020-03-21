@@ -1,3 +1,5 @@
+import { updateTeacher } from "../actions/teachers"
+
 const teacherReducerDefaultState = []
 
 const teacherReducer = (state = teacherReducerDefaultState, action) =>{
@@ -13,6 +15,21 @@ const teacherReducer = (state = teacherReducerDefaultState, action) =>{
             }else{
                 return state
             }
+        case 'UPDATE_TEACHER':
+            const { whomToUpdate,whatToUpdate} = action;
+            // const updatedState = state;
+            console.log(whomToUpdate)
+            const updatedState = state.map(teacher => {
+                if(teacher.name === whomToUpdate){
+                    return {
+                        ...teacher,
+                        ...whatToUpdate
+                    }
+                }else{
+                    return teacher
+                }
+            })
+            return updatedState
         default:
             return state;
     }

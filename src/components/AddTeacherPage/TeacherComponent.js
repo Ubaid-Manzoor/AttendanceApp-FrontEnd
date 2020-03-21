@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import './_teacherComponents.scss';
+import { startUpdateTeacher } from '../../actions/teachers';
 // import teacherReducer from '../../reducers/teachers';
 
 
@@ -14,6 +15,15 @@ class TeacherComponent extends Component {
 //             "isConfirmed" : isConfirmed
 //         }
 //     }
+    onButtonClick = (e) =>{
+        console.log(e)
+        console.log(this.props.isConfirmed)
+        const whomToUpdate = this.props.name;
+        const whatToUpdate = {
+            "confirmed": (!this.props.isConfirmed)
+        }
+        this.props.updataTeacher(whomToUpdate,whatToUpdate)
+    }
 
     render() {
         const { name:teachersName , isConfirmed} = this.props
@@ -27,9 +37,9 @@ class TeacherComponent extends Component {
                         {
                             (()=>{
                                 if(!isConfirmed){
-                                    return <button>Confirm</button>
+                                    return <button onClick={this.onButtonClick}>Confirm</button>
                                 }else{
-                                    return <button>Unconfirmed</button>
+                                    return <button onClick={this.onButtonClick}>Unconfirmed</button>
                                 }
                             })()
                         }
@@ -40,6 +50,10 @@ class TeacherComponent extends Component {
     }
 }
 
+const mapDispatchToProps = (dispatch)=>{
+    return {
+        updataTeacher : (whomToUpdate,whatToUpdate)=> dispatch(startUpdateTeacher(whomToUpdate,whatToUpdate))
+    }
+}
 
-
-export default connect()(TeacherComponent);
+export default connect(null,mapDispatchToProps)(TeacherComponent);

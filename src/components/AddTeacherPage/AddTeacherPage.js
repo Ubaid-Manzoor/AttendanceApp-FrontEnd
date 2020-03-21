@@ -10,7 +10,7 @@ class AddTeacherPage extends Component{
         super(props);
 
         this.props.setTeachers();
-        console.log("CALLED")
+        // console.log("CALLED")
 
         this.state = {
             teacherData: {
@@ -230,8 +230,8 @@ class AddTeacherPage extends Component{
                         <ol>
                             {
                                 listOfTeachers.map(teacher =>{
-                                    const {name, isConfirmed} = teacher 
-                                    return <li><TeacherComponent key={name} name={name} isConfirmed={isConfirmed} /></li>
+                                    const {name, confirmed} = teacher 
+                                    return <li key={name}><TeacherComponent name={name} isConfirmed={confirmed} /></li>
                                 })
                             }
                         </ol>

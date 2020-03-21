@@ -2,12 +2,10 @@ import React , { Component } from 'react'
 import {connect} from 'react-redux'
 // import Cookies from 'universal-cookie';
 // import {loginUser} from '../../actions/user'
-// import API from '../../api';
 import "./LoginPage.scss";
 // import {startLoginUser} from  "../../actions/user";
 import Cookies from 'universal-cookie';
-import JwtDecode from 'jwt-decode';
-// import 
+// import JwtDecode from 'jwt-decode';
 
 class LoginPage extends Component{
     constructor(props){
