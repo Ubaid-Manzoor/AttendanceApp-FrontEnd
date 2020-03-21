@@ -1,7 +1,8 @@
 /////////////////////////////// FOR TEACHERS ////////////////////////////////////////
-export const setTeacher = (name,confirmed,courseAssigned) => ({
+export const setTeacher = (username,name,confirmed,courseAssigned) => ({
     type: 'ADD_TEACHER',
     teacher: {
+        username,
         name,
         confirmed,
         courseAssigned
@@ -18,7 +19,7 @@ export const getAndSetTeachers = () => {
         .then(response => {
             console.log("RESPONSE : ",response)
             response.allTeachers.forEach(teacher => {
-                dispatch(setTeacher(teacher.name,teacher.confirmed,"Subject"))
+                dispatch(setTeacher(teacher.username,teacher.name,teacher.confirmed,"Subject"))
             });
         })
     }

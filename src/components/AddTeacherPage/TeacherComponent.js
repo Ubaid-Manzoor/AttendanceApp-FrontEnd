@@ -7,14 +7,6 @@ import { startUpdateTeacher } from '../../actions/teachers';
 
 
 class TeacherComponent extends Component {
-//     constructor(props){
-//         super(props);
-
-//         this.state = {
-//             "teachersName": teachersName,
-//             "isConfirmed" : isConfirmed
-//         }
-//     }
     onButtonClick = (e) =>{
         console.log(e)
         console.log(this.props.isConfirmed)
@@ -26,13 +18,13 @@ class TeacherComponent extends Component {
     }
 
     render() {
-        const { name:teachersName , isConfirmed} = this.props
+        const { username ,name:teachersName , isConfirmed} = this.props
         return (
             <div className={`teacherComponent_Body ${isConfirmed ? "" : "notConfirmed"}`}>
                 <div className="teacherComponent_Container">
                     <div className="teacherComponent_Data">
                         <h2>
-                            {teachersName}
+                            {teachersName}<span>({username})</span>
                         </h2>
                         {
                             (()=>{

@@ -15,6 +15,7 @@ class AddTeacherPage extends Component{
         this.state = {
             teacherData: {
                 username: "",
+                name: "",
                 password: "",
                 confirmPassword: ""
             },
@@ -22,6 +23,7 @@ class AddTeacherPage extends Component{
             errors:{
                 username: "",
                 password: "",
+                name: "",
                 confirmPassword: "",
                 teacherExists: "",
                 otherError: ""
@@ -59,6 +61,7 @@ class AddTeacherPage extends Component{
         this.setErrors({
             username: "",
             password: "",
+            name: "",
             otherError: "",
             confirmPassword: "",
             teacherExists: ""
@@ -70,13 +73,19 @@ class AddTeacherPage extends Component{
     applyAuthentication(teacherData){
         if(teacherData.username === ''){
             this.setErrors({username: "Fill the box"})
-        }else if(teacherData.password === ''){
+        }
+        if(teacherData.password === ''){
             this.setErrors({password: "Fill the box"})
-        }else if(teacherData.confirmPassword === ''){
+        }
+        if(teacherData.name === ''){
+            this.setErrors({name: "Fill the box"})
+        }
+        if(teacherData.confirmPassword === ''){
             this.setErrors({confirmPassword: "Fill the box"})
         }else if(teacherData['password'] !== teacherData['confirmPassword']){
             this.setErrors({confirmPassword: "password did not match"})
         }
+
     }
 
     waitTillStateChange(callback){
@@ -100,7 +109,7 @@ class AddTeacherPage extends Component{
         this.applyAuthentication(teacherData);
 
         this.waitTillStateChange(()=>{
-            console.log(this.state);
+
             if(!this.state.errorsExists){
                 fetch('http://localhost:5000/signup',{
                     method: 'POST',
@@ -179,6 +188,26 @@ class AddTeacherPage extends Component{
                             <div>
                                 <label 
                                     className="Label"
+                                    htmlFor="name"
+                                >
+                                    Name Of Teacher
+                                </label>
+                                <div className="inputErrorDiv">
+                                    <div className="inputDiv">
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            placeholder=""
+                                            value={this.state.teacherData.name}
+                                            onChange={this.onInputChange}
+                                        />
+                                    </div>
+                                    {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>}
+                                </div>
+                            </div>
+                            <div>
+                                <label 
+                                    className="Label"
                                     htmlFor="password"
                                 >
                                     Password
@@ -230,8 +259,8 @@ class AddTeacherPage extends Component{
                         <ol>
                             {
                                 listOfTeachers.map(teacher =>{
-                                    const {name, confirmed} = teacher 
-                                    return <li key={name}><TeacherComponent name={name} isConfirmed={confirmed} /></li>
+                                    const {username,name, confirmed} = teacher 
+                                    return <li key={name}><TeacherComponent username={username} name={name} isConfirmed={confirmed} /></li>
                                 })
                             }
                         </ol>

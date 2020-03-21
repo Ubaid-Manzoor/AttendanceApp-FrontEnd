@@ -1,4 +1,4 @@
-.MainBody{
+.department_MainBody{
     flex: 12;
     background-color: #ebebeb;
     min-height: 100vh;
@@ -22,7 +22,7 @@
     }
 }
 
-.Container{
+.department_Container{
     width: 40rem;
     margin:auto;
     background-color: white;
@@ -30,7 +30,7 @@
     border-radius: 0.8rem;
 }
 
-.FormContainer{
+.department_FormContainer{
     font-family: 'Play', sans-serif;
     .Label{
         display: block;
@@ -85,7 +85,6 @@
     .Button{
         background-color: #333;
         display:inline-block;
-        // width:9rem;
         padding:1.2rem;
         border-radius:3rem;
         text-align: center;
