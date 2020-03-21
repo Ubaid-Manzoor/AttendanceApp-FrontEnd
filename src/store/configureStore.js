@@ -2,6 +2,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import userReducer from '../reducers/user';
 import courseReducer from '../reducers/courses';
 import teacherReducer from '../reducers/teachers';
+import studentReducer from '../reducers/students';
 import thunk from 'redux-thunk';
 
 
@@ -10,7 +11,8 @@ export default () => {
     combineReducers({
       user: userReducer,
       courses: courseReducer,
-      teachers: teacherReducer
+      teachers: teacherReducer,
+      students: studentReducer
     }),
     applyMiddleware(thunk)
   );
