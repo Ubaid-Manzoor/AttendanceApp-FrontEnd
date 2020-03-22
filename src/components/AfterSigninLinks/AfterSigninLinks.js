@@ -45,7 +45,7 @@ class AfterSigninLinks extends Component{
             {
               this.state.userRole === 'admin' && 
               <React.Fragment>
-                <Link to="/addDepartment" className="navigation-item">Add Department</Link>
+                <Link to="/department" className="navigation-item">Add Department</Link>
                 <Link to="/addCourse" className="navigation-item">Add Course</Link>
                 <Link to="/addTeacher" className="navigation-item">Add Teacher</Link>
                 <Link to="/addStudent" className="navigation-item">Add Student</Link>

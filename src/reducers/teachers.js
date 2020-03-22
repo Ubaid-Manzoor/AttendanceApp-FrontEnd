@@ -5,7 +5,7 @@ const teacherReducerDefaultState = []
 const teacherReducer = (state = teacherReducerDefaultState, action) =>{
     switch(action.type){
         case 'ADD_TEACHER':
-            console.log("TEACHER REDUCER CALLED")
+            // console.log("TEACHER REDUCER CALLED")
         //  CHECK IF COURSE ALREADY EXISTS ONLY THEN SAVE IT...
             if(!state.find( teacher => teacher.name === action.teacher.name)){
                 return [
@@ -20,7 +20,7 @@ const teacherReducer = (state = teacherReducerDefaultState, action) =>{
             // const updatedState = state;
             console.log(whomToUpdate)
             const updatedState = state.map(teacher => {
-                if(teacher.name === whomToUpdate){
+                if(teacher.username === whomToUpdate){
                     return {
                         ...teacher,
                         ...whatToUpdate

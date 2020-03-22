@@ -4,18 +4,21 @@ import { getAndSetTeachers } from '../../actions/teachers';
 
 import './_addTeacherPage.scss';
 import TeacherComponent from './TeacherComponent';
+import { getAndSetDepartments } from '../../actions/department';
 
 class AddTeacherPage extends Component{
     constructor(props){
         super(props);
 
         this.props.setTeachers();
+        this.props.setDepartments();
         // console.log("CALLED")
 
         this.state = {
             teacherData: {
                 username: "",
                 name: "",
+                department: "",
                 password: "",
                 confirmPassword: ""
             },
@@ -95,23 +98,8 @@ class AddTeacherPage extends Component{
         )
     }
 
-
-    onSubmit = (e)=>{
-        e.preventDefault();
-
-        const teacherData = {
-            ...this.state.teacherData,
-            "role": "teacher",
-            "confirmed": true
-        };
-
-        this.clearAllErrors();
-        this.applyAuthentication(teacherData);
-
-        this.waitTillStateChange(()=>{
-
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/signup',{
+    makeRequest = (teacherData)=>{
+        fetch('http://localhost:5000/signup',{
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -148,6 +136,28 @@ class AddTeacherPage extends Component{
                         }
                     }
                 })
+    }
+
+
+    onSubmit = (e)=>{
+        e.preventDefault();
+
+        const teacherData = {
+            ...this.state.teacherData,
+            "role": "teacher",
+            "confirmed": true
+        };
+
+        this.clearAllErrors();
+        this.applyAuthentication(teacherData);
+
+        this.waitTillStateChange(()=>{
+
+            if(!this.state.errorsExists){
+                if(teacherData.department === ""){
+                    teacherData["department"] = this.props.departments[0]['name']
+                }
+                this.makeRequest(teacherData)
             }
         })
 
@@ -155,6 +165,8 @@ class AddTeacherPage extends Component{
 
     render() {
         const listOfTeachers = this.props.teachers;
+        const listOfDepartments = this.props.departments;
+        console.log(listOfDepartments);
         return (
             <div className="AddTeacher_MainBody sidePage">
                 <div className="AddTeacher_Container">
@@ -203,6 +215,24 @@ class AddTeacherPage extends Component{
                                         />
                                     </div>
                                     {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="Label" htmlFor="department">Department</label>
+                                <div className="selectDiv">
+                                    <select 
+                                        id="department"
+                                        name="department"
+                                        value={this.state.teacherData.department}
+                                        onChange={this.onInputChange}
+                                    >
+                                        {
+                                            listOfDepartments.map( department =>{
+                                                const { name } = department
+                                                return <option key={name} value={name}>{name}</option>
+                                            })
+                                        }
+                                    </select>
                                 </div>
                             </div>
                             <div>
@@ -274,13 +304,15 @@ class AddTeacherPage extends Component{
 
 const mapStateToProps = (state)=>{
     return {
-        teachers: state.teachers
+        teachers: state.teachers,
+        departments: state.departments
     }
 }
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setTeachers : () => dispatch(getAndSetTeachers())
+        setTeachers : () => dispatch(getAndSetTeachers()),
+        setDepartments: () => dispatch(getAndSetDepartments())
     }
 }
 

@@ -10,7 +10,7 @@ class TeacherComponent extends Component {
     onButtonClick = (e) =>{
         console.log(e)
         console.log(this.props.isConfirmed)
-        const whomToUpdate = this.props.name;
+        const whomToUpdate = this.props.username;
         const whatToUpdate = {
             "confirmed": (!this.props.isConfirmed)
         }
@@ -20,7 +20,7 @@ class TeacherComponent extends Component {
     render() {
         const { username ,name:teachersName , isConfirmed} = this.props
         return (
-            <div className={`teacherComponent_Body ${isConfirmed ? "" : "notConfirmed"}`}>
+            <div className={`teacherComponent_Body ${isConfirmed ? "" : "teacherComponent_notConfirmed"}`}>
                 <div className="teacherComponent_Container">
                     <div className="teacherComponent_Data">
                         <h2>

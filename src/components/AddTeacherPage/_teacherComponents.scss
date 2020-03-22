@@ -51,11 +51,15 @@
     }
 }
 
-.notConfirmed{
+.teacherComponent_notConfirmed{
     background-color: #dc3545;
+    color: #6c757d;
     button:hover{
         background-color: #28a745;
         color: #333;
+    }
+    span{
+        color: #dcdcdc;
     }
 }
 .teacherComponent_Container{

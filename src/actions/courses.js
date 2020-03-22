@@ -14,7 +14,9 @@ const getAndSetCourses = ()=>{
         })
         .then(response => response.json())
         .then(response => {
+            console.log(response.allCourses)
             response.allCourses.forEach(course => {
+                console.log(course)
                 dispatch(addCourse(course))
             });
         })

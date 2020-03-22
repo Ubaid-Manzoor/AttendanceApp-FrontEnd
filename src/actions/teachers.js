@@ -1,9 +1,10 @@
 /////////////////////////////// FOR TEACHERS ////////////////////////////////////////
-export const setTeacher = (username,name,confirmed,courseAssigned) => ({
+export const setTeacher = (username,name,department,confirmed,courseAssigned) => ({
     type: 'ADD_TEACHER',
     teacher: {
         username,
         name,
+        department,
         confirmed,
         courseAssigned
     }
@@ -17,9 +18,10 @@ export const getAndSetTeachers = () => {
         })
         .then(response => response.json())
         .then(response => {
-            console.log("RESPONSE : ",response)
+            // console.log("RESPONSE : ",response)
             response.allTeachers.forEach(teacher => {
-                dispatch(setTeacher(teacher.username,teacher.name,teacher.confirmed,"Subject"))
+                const { username, name, department, confirmed} = teacher;
+                dispatch(setTeacher(username,name,department,confirmed,"Subject"))
             });
         })
     }
@@ -32,6 +34,7 @@ export const updateTeacher = (whomToUpdate,whatToUpdate) => ({
 });
 
 export const startUpdateTeacher = (whomToUpdate,whatToUpdate) => {
+    
     console.log("ToUPdata",whatToUpdate)
     return (dispatch) => {
         fetch('http://localhost:5000/update_teacher',{
@@ -46,7 +49,7 @@ export const startUpdateTeacher = (whomToUpdate,whatToUpdate) => {
         })
         .then(response => response.json())
         .then(response => {
-            console.log(response);
+            // console.log(response);
             const { status } = response;
             if(status){
                 dispatch(updateTeacher(whomToUpdate,whatToUpdate))

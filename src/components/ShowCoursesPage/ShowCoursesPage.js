@@ -23,8 +23,13 @@ class ShowCoursesPage extends Component {
                     <header></header>
                     <div className="mainBody">
                         {listOfCourses.map((course =>{
-                            const {name, teacherAssigned } = course;
-                            return <CourseComponent key={name} name={name} teacherAssigned={teacherAssigned} />
+                            const {name, department, teacherAssigned } = course;
+                            return <CourseComponent 
+                                        key={name+department} 
+                                        department={department} 
+                                        name={name} 
+                                        teacherAssigned={teacherAssigned} 
+                                   />
                         }))}
                     </div>
                 </div>

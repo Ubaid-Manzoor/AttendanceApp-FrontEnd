@@ -73,14 +73,19 @@
         cursor:pointer;
     }
 
-    // .Footer{
-    //     display: flex;
-    //     justify-content: space-between;
-    //     label{
-    //         vertical-align:top;
-    //     }
-    //     margin-bottom:2.9rem;
-    // }
+    .selectDiv{
+        border: 1px solid #e6e6e6;
+        margin-bottom: 2rem;
+        select{
+            background: none;
+            display: block;
+            width: 100%;
+            height: 3em;
+            border: none;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.2rem;
+        }
+    }
 
     .Button{
         background-color: #333;

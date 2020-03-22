@@ -1,4 +1,4 @@
-.student_ListBlock{
+.department_ListBlock{
     font-family: 'Quicksand', sans-serif;
     margin-top:2rem;
     background-color: #f1f3f4;
@@ -9,23 +9,25 @@
         font-size: 1.5rem;
 
     }
-    .student_MainContainer{
+    .department_MainContainer{
     }
 }
 
 
 
-.studentComponent_Body{
-    background-color: #28a745;
+.departmentComponent_Body{
+    background-color: #007bff;
     color: #fff;
     margin-bottom:0.2rem;
     border-radius:5px;
     
-    .studentComponent_Data{
+    .departmentComponent_Data{
         display:flex;
         justify-content:space-between
+        // span{
+        //     font-size: 1rem;
+        // }
     }
-    
     span{
         font-size:1rem;
         color:#333;
@@ -49,25 +51,14 @@
     }
 }
 
-.studentComponent_notConfirmed{
+.notConfirmed{
     background-color: #dc3545;
-    color: #6c757d;
     button:hover{
         background-color: #28a745;
         color: #333;
     }
-    span{
-        color: #dcdcdc;
-    }
 }
-// .notConfirmed{
-//     background-color: #dc3545;
-//     button:hover{
-//         background-color: #28a745;
-//         color: #333;
-//     }
-// }
-.studentComponent_Container{
+.departmentComponent_Container{
     padding:1rem 2rem;
 
 }

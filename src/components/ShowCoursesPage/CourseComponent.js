@@ -1,7 +1,7 @@
 import React from 'react';
 
 const CourseComponent = (props)=>{
-    const { name, teacherAssigned } = props;
+    const { name,department , teacherAssigned } = props;
     
     return(
         <div className="courseMainDiv">
@@ -11,7 +11,12 @@ const CourseComponent = (props)=>{
                         <h1>{name}</h1>
                     </header>
                     <div className="courseBody">
-                        TeacherAssigned : <h1>{teacherAssigned}</h1>
+                        <p>
+                            Department : <span>{department}</span>
+                        </p>
+                        <p>
+                            TeacherAssigned : <span>{teacherAssigned}</span>
+                        </p>
                     </div>
                 </div>
             </div>

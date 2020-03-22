@@ -2,7 +2,7 @@ import React from 'react';
 import './_teacherComponent.scss';
 
 const TeacherComponent = (props)=>{
-    const { username,name, courseAssigned } = props;
+    const { username, name, department, courseAssigned } = props;
     return(
         <div className="teacherMainDiv">
             <div className="teacherMainContainer">
@@ -14,7 +14,12 @@ const TeacherComponent = (props)=>{
 
                     </header>
                     <div className="teacherBody">
-                        CourseAssigned : <h1>{courseAssigned}</h1>
+                        <p>
+                            CourseAssigned : <span>{courseAssigned}</span>
+                        </p>
+                        <p>
+                            Department : <span>{department}</span>
+                        </p>
                     </div>
                 </div>
             </div>

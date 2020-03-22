@@ -18,6 +18,14 @@
             }
             .teacherBody{
                 padding:1rem 2rem 1rem 2rem;
+                p{
+                    font-size: 1.3rem;
+                    color:#007bff;
+                    span{
+                        color:#333;
+                        font-size: 1rem;
+                    }
+                }
             }
         }
     }

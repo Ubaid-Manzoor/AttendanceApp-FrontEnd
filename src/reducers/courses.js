@@ -5,7 +5,8 @@ const courseReducer = (state = courseReducerDefaultState, action) =>{
         case 'ADD_COURSE':
 
         //  CHECK IF COURSE ALREADY EXISTS ONLY THEN SAVE IT...
-            if(!state.find( course => course.name === action.course.name)){
+            console.log(action.course)
+            if(!state.find( course => (course.name === action.course.name) && (course.department === action.course.department) )){
                 return [
                     ...state,
                     action.course

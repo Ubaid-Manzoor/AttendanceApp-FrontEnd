@@ -4,23 +4,28 @@ import { getAndSetStudents } from '../../actions/students';
 
 import './_addStudentPage.scss';
 import StudentComponent from './StudentComponent';
+import { getAndSetDepartments } from '../../actions/department';
 
 class AddStudentPage extends Component{
     constructor(props){
         super(props);
 
         this.props.setStudents();
-        // console.log("CALLED")
+        this.props.setDepartments();
 
         this.state = {
             studentData: {
                 username: "",
+                name: "",
+                department: "",
+                semester: 1,
                 password: "",
                 confirmPassword: ""
             },
             errorsExists: false,
             errors:{
                 username: "",
+                name: "",
                 password: "",
                 confirmPassword: "",
                 studentExist: "",
@@ -33,6 +38,7 @@ class AddStudentPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
+        console.log(value,name)
         this.setState((prevState)=>{
             return {
                 studentData: {
@@ -58,6 +64,7 @@ class AddStudentPage extends Component{
     clearAllErrors = ()=>{
         this.setErrors({
             username: "",
+            name: "",
             password: "",
             otherError: "",
             confirmPassword: "",
@@ -70,9 +77,14 @@ class AddStudentPage extends Component{
     applyAuthentication(studentData){
         if(studentData.username === ''){
             this.setErrors({username: "Fill the box"})
-        }else if(studentData.password === ''){
+        }
+        if(studentData.name === ''){
+            this.setErrors({name: "Fill the box"})
+        }
+        if(studentData.password === ''){
             this.setErrors({password: "Fill the box"})
-        }else if(studentData.confirmPassword === ''){
+        }
+        if(studentData.confirmPassword === ''){
             this.setErrors({confirmPassword: "Fill the box"})
         }else if(studentData['password'] !== studentData['confirmPassword']){
             this.setErrors({confirmPassword: "password did not match"})
@@ -86,23 +98,9 @@ class AddStudentPage extends Component{
         )
     }
 
-
-    onSubmit = (e)=>{
-        e.preventDefault();
-
-        const studentData = {
-            ...this.state.studentData,
-            "role": "student",
-            "confirmed": true
-        };
-
-        this.clearAllErrors();
-        this.applyAuthentication(studentData);
-
-        this.waitTillStateChange(()=>{
-            console.log(this.state);
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/signup',{
+    makeRequest = (studentData) =>{
+        console.log(studentData)
+        fetch('http://localhost:5000/signup',{
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -139,6 +137,27 @@ class AddStudentPage extends Component{
                         }
                     }
                 })
+    }
+
+
+    onSubmit = (e)=>{
+        e.preventDefault();
+
+        const studentData = {
+            ...this.state.studentData,
+            "role": "student",
+            "confirmed": true
+        };
+
+        this.clearAllErrors();
+        this.applyAuthentication(studentData);
+
+        this.waitTillStateChange(()=>{
+            if(!this.state.errorsExists){
+                if(studentData.department === ""){
+                    studentData["department"] = this.props.departments[0]['name']
+                }
+                this.makeRequest(studentData) 
             }
         })
 
@@ -146,7 +165,9 @@ class AddStudentPage extends Component{
 
     render() {
         const listOfStudents = this.props.students;
-        console.log(listOfStudents)
+        const listOfDepartments = this.props.departments;
+        // console.log(listOfStudents);
+        // console.log(listOfStudents);
         return (
             <div className="AddStudent_MainBody sidePage">
                 <div className="AddStudent_Container">
@@ -180,6 +201,64 @@ class AddStudentPage extends Component{
                             <div>
                                 <label 
                                     className="Label"
+                                    htmlFor="name"
+                                >
+                                    Name Of Student
+                                </label>
+                                <div className="inputErrorDiv">
+                                    <div className="inputDiv">
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            placeholder=""
+                                            value={this.state.studentData.name}
+                                            onChange={this.onInputChange}
+                                        />
+                                    </div>
+                                    {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="Label" htmlFor="department">Department</label>
+                                <div className="selectDiv">
+                                    <select 
+                                        id="department"
+                                        name="department"
+                                        value={this.state.studentData.department}
+                                        onChange={this.onInputChange}
+                                    >
+                                        {
+                                            listOfDepartments.map( department =>{
+                                                const { name } = department
+                                                return <option key={name} value={name}>{name}</option>
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="Label" htmlFor="semester">Semester</label>
+                                <div className="selectDiv">
+                                    <select 
+                                        id="semester"
+                                        name="semester"
+                                        value={this.state.studentData.semester}
+                                        onChange={this.onInputChange}
+                                    >
+                                        <option  value="1">1</option>
+                                        <option  value="2">2</option>
+                                        <option  value="3">3</option>
+                                        <option  value="4">4</option>
+                                        <option  value="5">5</option>
+                                        <option  value="6">6</option>
+                                        <option  value="7">7</option>
+                                        <option  value="8">8</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label 
+                                    className="Label"
                                     htmlFor="password"
                                 >
                                     Password
@@ -202,7 +281,7 @@ class AddStudentPage extends Component{
                                     className="Label"
                                     htmlFor="confirmPassword"
                                 >
-                                    Password
+                                    Confirm Password
                                 </label>
                                 <div className="inputErrorDiv">
                                     <div className="inputDiv">
@@ -231,8 +310,17 @@ class AddStudentPage extends Component{
                         <ol>
                             {
                                 listOfStudents.map(student =>{
-                                    const {name, confirmed} = student
-                                    return <li key={name}><StudentComponent name={name} isConfirmed={confirmed} /></li>
+                                    const {username, name, department, semester, confirmed} = student
+                                    return <li 
+                                            key={username}>
+                                                <StudentComponent 
+                                                    username={username} 
+                                                    name={name} 
+                                                    department={department} 
+                                                    semester={semester} 
+                                                    isConfirmed={confirmed} 
+                                                    />
+                                            </li>
                                 })
                             }
                         </ol>
@@ -246,13 +334,15 @@ class AddStudentPage extends Component{
 
 const mapStateToProps = (state)=>{
     return {
-        students: state.students
+        students: state.students,
+        departments: state.departments
     }
 }
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setStudents : () => dispatch(getAndSetStudents())
+        setStudents : () => dispatch(getAndSetStudents()),
+        setDepartments: () => dispatch(getAndSetDepartments())
     }
 }
 

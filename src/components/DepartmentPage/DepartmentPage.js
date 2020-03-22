@@ -1,11 +1,16 @@
 import React , { Component } from 'react';
+import { connect } from 'react-redux';
+import { getAndSetDepartments } from '../../actions/department';
 
-import  './_addDepartmentPage.scss';
+import DepartmentComponent from './DepartmentComponent';
 
-class AddDepartmentPage extends Component{
+import  './_DepartmentPage.scss';
+
+class DepartmentPage extends Component{
     constructor(props){
         super(props);
 
+        this.props.setDepartments();
         this.state = {
             departmentData: {
                 departmentName: ""
@@ -123,6 +128,7 @@ class AddDepartmentPage extends Component{
     }
 
     render() {
+        const listOfDepartments = this.props.departments;
         return (
             <div className="department_MainBody sidePage">
                 <div className="department_Container">
@@ -159,9 +165,37 @@ class AddDepartmentPage extends Component{
                         </form>
                     </div>
                 </div>
+                    <div className="teacher_ListBlock">
+                        <header>
+                            <h2> All Department </h2>
+                        </header>
+                        <div className="teacher_MainContainer">
+                            <ol>
+                                {
+                                    listOfDepartments.map(department =>{
+                                        const { name } = department; 
+                                        return <li key={name}><DepartmentComponent name={name}  /></li>
+                                    })
+                                }
+                            </ol>
+                        </div>
+                    </div>
             </div>
         )
     }
 }
 
-export default AddDepartmentPage;
+const mapStateToProps = (state)=>{
+    return {
+        departments: state.departments
+    }
+}
+
+const mapDispatchToProps = (dispatch)=>{
+    return{
+        setDepartments : () => dispatch(getAndSetDepartments())
+    }
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(DepartmentPage);
+

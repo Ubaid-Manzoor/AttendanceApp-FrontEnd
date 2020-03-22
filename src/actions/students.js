@@ -1,8 +1,11 @@
 /////////////////////////////// FOR TEACHERS ////////////////////////////////////////
-export const setStudent = (name,confirmed) => ({
+export const setStudent = (username,name,department,semester,confirmed) => ({
     type: 'ADD_STUDENT',
     student: {
+        username,
         name,
+        department,
+        semester,
         confirmed
     }
 })
@@ -15,9 +18,10 @@ export const getAndSetStudents = () => {
         })
         .then(response => response.json())
         .then(response => {
-            console.log("RESPONSE : ",response)
+            console.log("RESPONSE STUDENTS : ",response)
             response.allStudents.forEach(student => {
-                dispatch(setStudent(student.name,student.confirmed))
+                const { username, name, department, semester, confirmed } = student;
+                dispatch(setStudent(username,name,department,semester,confirmed))
             });
         })
     }
