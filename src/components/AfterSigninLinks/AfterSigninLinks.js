@@ -32,6 +32,7 @@ class AfterSigninLinks extends Component{
           <div className='navigation'>
             { this.state.userRole === 'student' && 
               <React.Fragment>
+                <Link to="/enroll" className='navigation-item'>Enroll To Course</Link>
                 <Link to="/attendance" className='navigation-item'>Attendance</Link>
               </React.Fragment>
             }

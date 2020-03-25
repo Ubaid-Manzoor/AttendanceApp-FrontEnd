@@ -13,11 +13,13 @@ import { getAndSetUser } from '../src/actions/user'
 import { getUsernameFromCookie} from './helperFunction/getCookie';
 
 const store = configureStore();
-store.dispatch(getAndSetUser(getUsernameFromCookie()))
+const user = getUsernameFromCookie()
+
+if(user){
+  store.dispatch(getAndSetUser(getUsernameFromCookie()))
+}
 
 store.subscribe(()=>{
-  // const cookies = new Cookies();
-  // console.log(cookies.getAll());
   console.log(store.getState());
 })
 

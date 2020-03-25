@@ -129,7 +129,6 @@ class LoginPage extends Component{
         this.clearAllErrors();
         this.applyAuthentication(login_data)
 
-
         this.waitTillStateChange(()=>{
             if(!this.state.errorsExists){
                 fetch('http://localhost:5000/login',{

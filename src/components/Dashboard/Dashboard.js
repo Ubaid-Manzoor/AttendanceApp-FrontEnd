@@ -18,6 +18,7 @@ class Dashboard extends Component{
     const logginStatus = this.checkLogginStatus();
     const cookies = new Cookies();
     console.log(cookies.getAll());
+    console.log("DASH")
     this.state = {
       logginStatus
     }
@@ -26,6 +27,7 @@ class Dashboard extends Component{
 
   componentDidMount = () => {
     if(this.state.logginStatus){
+      console.log("LOGGEDIN")
       this.props.getSetUser(getUsernameFromCookie());
     }
     const cookies = new Cookies();

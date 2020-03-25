@@ -15,13 +15,14 @@ class AddCoursePage extends Component{
         this.props.setDepartments();
         this.state = {
             courseData: {
-                courseName: "",
+                name: "",
                 department: "",
+                semester: 1,
                 teacherAssigned: ""
             },
             errorsExists: false,
             errors:{
-                courseName: "",
+                name: "",
                 courseExist: "",
                 otherError: ""
             },
@@ -56,7 +57,7 @@ class AddCoursePage extends Component{
 
     clearAllErrors = ()=>{
         this.setErrors({
-            courseName: "",
+            name: "",
             otherError: "",
             courseExist: ""
         })
@@ -65,8 +66,8 @@ class AddCoursePage extends Component{
 
 
     applyAuthentication(courseData){
-        if(courseData.courseName === ''){
-            this.setErrors({courseName: "Fill the box"})
+        if(courseData.name === ''){
+            this.setErrors({name: "Fill the box"})
         }
     }
 
@@ -155,7 +156,7 @@ class AddCoursePage extends Component{
                             <div>
                                 <label 
                                     className="Label"
-                                    htmlFor="courseName"
+                                    htmlFor="name"
                                 >
                                     Name Of Course
                                 </label>
@@ -163,13 +164,13 @@ class AddCoursePage extends Component{
                                     <div className="inputDiv">
                                         <input
                                             type="text"
-                                            id="courseName"
+                                            id="name"
                                             placeholder=""
-                                            value={this.state.courseData.courseName}
+                                            value={this.state.courseData.name}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
-                                    {this.state.errors.courseName && <span className="errorMessage">{this.state.errors.courseName}</span>}
+                                    {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>}
                                 </div>
                             </div>
                             <div>
@@ -205,6 +206,26 @@ class AddCoursePage extends Component{
                                                 return <option key={name} value={name}>{name}</option>
                                             })
                                         }
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="Label" htmlFor="semester">Semester</label>
+                                <div className="selectDiv">
+                                    <select 
+                                        id="semester"
+                                        name="semester"
+                                        // value={this.state.courseData.semester}
+                                        onChange={this.onInputChange}
+                                    >
+                                        <option  value="1">1</option>
+                                        <option  value="2">2</option>
+                                        <option  value="3">3</option>
+                                        <option  value="4">4</option>
+                                        <option  value="5">5</option>
+                                        <option  value="6">6</option>
+                                        <option  value="7">7</option>
+                                        <option  value="8">8</option>
                                     </select>
                                 </div>
                             </div>

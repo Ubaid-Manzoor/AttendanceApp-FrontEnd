@@ -17,6 +17,7 @@ class AddStudentPage extends Component{
             studentData: {
                 username: "",
                 name: "",
+                roll_no: "",
                 department: "",
                 semester: 1,
                 password: "",
@@ -26,6 +27,7 @@ class AddStudentPage extends Component{
             errors:{
                 username: "",
                 name: "",
+                roll_no: "",
                 password: "",
                 confirmPassword: "",
                 studentExist: "",
@@ -65,6 +67,7 @@ class AddStudentPage extends Component{
         this.setErrors({
             username: "",
             name: "",
+            roll_no: "",
             password: "",
             otherError: "",
             confirmPassword: "",
@@ -79,6 +82,9 @@ class AddStudentPage extends Component{
             this.setErrors({username: "Fill the box"})
         }
         if(studentData.name === ''){
+            this.setErrors({name: "Fill the box"})
+        }
+        if(studentData.roll_no === ''){
             this.setErrors({name: "Fill the box"})
         }
         if(studentData.password === ''){
@@ -149,14 +155,17 @@ class AddStudentPage extends Component{
             "confirmed": true
         };
 
+        
         this.clearAllErrors();
         this.applyAuthentication(studentData);
-
+        
         this.waitTillStateChange(()=>{
             if(!this.state.errorsExists){
                 if(studentData.department === ""){
                     studentData["department"] = this.props.departments[0]['name']
                 }
+                
+                delete studentData['confirmPassword']
                 this.makeRequest(studentData) 
             }
         })
@@ -216,6 +225,26 @@ class AddStudentPage extends Component{
                                         />
                                     </div>
                                     {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>}
+                                </div>
+                            </div>
+                            <div>
+                                <label 
+                                    className="Label"
+                                    htmlFor="roll_no"
+                                >
+                                    Roll Number Of Student
+                                </label>
+                                <div className="inputErrorDiv">
+                                    <div className="inputDiv">
+                                        <input
+                                            type="text"
+                                            id="roll_no"
+                                            placeholder=""
+                                            value={this.state.studentData.roll_no}
+                                            onChange={this.onInputChange}
+                                        />
+                                    </div>
+                                    {this.state.errors.roll_no && <span className="errorMessage">{this.state.errors.roll_no}</span>}
                                 </div>
                             </div>
                             <div>

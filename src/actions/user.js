@@ -10,7 +10,6 @@ export const setUser = (username,password,role) => ({
 })
 
 export const getAndSetUser = ((username)=>{
-  // console.log("USERNAME :", username)
   return (dispatch)=>{
         fetch('http://localhost:5000/get_user',{
           method: 'POST',
