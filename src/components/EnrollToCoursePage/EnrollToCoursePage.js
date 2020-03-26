@@ -17,28 +17,22 @@ class EnrollToCoursePage extends Component{
         
         this.state = {
             isFetching: false,
-            FetchingTime : 500 ,
+            FetchingTime : 100 ,
             enrollData: {
                 studentImage: undefined
             },
             errorsExists: false,
             errors:{
-                roll_no: "",
+                courseError: "",
+                fileError: "",
                 otherError: ""
             },
-            message: ""
+            messages: {} 
         }
-
-        // const currentStudent = this.getCurrentStudent();
-        // console.log(currentStudent); 
     }
     
     onFileInputChange = (e) => {
         const value = e.target.files[0];
-        // const name =  e.target.id;
-
-        console.log(value)
-
         this.setState((prevState)=>{
             return {
                 enrollData: {
@@ -47,14 +41,13 @@ class EnrollToCoursePage extends Component{
                 }
             }
         })
+        
     }
     
     onInputChange = (e)=>{
         const name = e.target.id;
-        const value = !this.state.enrollData[name];
-        
+        const value = !(this.state.enrollData.courseData[name]);
 
-        console.log("VALUE : " ,value,"NAME : ", name)
         this.setState((prevState)=>{
             return {
                 enrollData: {
@@ -65,7 +58,7 @@ class EnrollToCoursePage extends Component{
                     }
                  }
             }
-        })
+        },()=>{console.log( this.state.enrollData.courseData)})
     }
 
     setErrors = (toUpdate)=>{
@@ -76,7 +69,7 @@ class EnrollToCoursePage extends Component{
                     ...toUpdate
                 }
             }
-        })
+        },()=> console.log(this.state.errors))
         this.setState({errorsExists: true});
     }
     
@@ -90,8 +83,21 @@ class EnrollToCoursePage extends Component{
 
     
     applyAuthentication(enrollData){
-        if(enrollData.roll_no === ''){
-            this.setErrors({roll_no: "Fill the box"})
+        console.log(enrollData)
+        const { courseData, studentImage } = enrollData
+        // courseData.va.forEach(course => {
+            // if(course)
+        // })
+        let courseDataError = true
+        for( const key in courseData){
+            if(courseData[key]){ courseDataError = false}
+        }
+
+        if(courseDataError){
+            this.setErrors({courseError: "Atleast Select one course"})
+        }
+        if(studentImage === undefined){
+            this.setErrors({fileError: "Upload a File"})
         }
     }
 
@@ -102,9 +108,8 @@ class EnrollToCoursePage extends Component{
         )
     }
 
-    makeRequest = () =>{
-        // console.log(enrollData)
 
+    makeRequest = () =>{
         let formData = new FormData();
         const { studentImage, courseData }  = this.state.enrollData;
 
@@ -112,57 +117,66 @@ class EnrollToCoursePage extends Component{
         formData.append("courseData",JSON.stringify(courseData));
         formData.append("roll_no",this.state.currentStudent.roll_no)
 
-        for(var pair of formData.entries()) {
-            console.log(pair[0]+ ', '+ pair[1]); 
-            }
-        // console.log("FORMDATA :::::::::::: ", formData.getAll())
-        fetch('http://localhost:5000/enroll_student',{
+        // for(var pair of formData.entries()) {
+        //     console.log(pair[0]+ ', '+ pair[1]); 
+        // }
+        this.applyAuthentication(this.state.enrollData);
+        this.waitTillStateChange(()=>{    
+            if(!this.state.errorsExists){
+                fetch('http://localhost:5000/enroll_student',{
                     method: 'POST',
                     body: formData
                 })
                 .then(response => response.json())
-                .then(response => {
-                    const { message , status } = response.result;
-                    
-                    if(response.status === 200){
-                        switch(status){
-                            case 201:
-                                console.log(message)
-                                this.setState({
-                                    message
-                                })
-                                break;
+                .then(responseArray => {
+                    console.log(responseArray)
+                    responseArray.forEach(response => {
+                        const { name } = response;
+                        const { message , status } = response.result;
+                        console.log(name)
+                        if(response.status === 200){
+                            switch(status){
+                                case 201:
+                                    console.log(message)
+                                    this.setState(prevState => ({
+                                        messages: {
+                                            ...prevState.messages,
+                                            [name]: message
+                                        }
+                                    }))
+                                    break;
                                 case 409:
-                                this.setErrors({
-                                    courseExist:message
-                                })
-                                console.log(message)
-                                break;
-                            case 400:
-                                this.setErrors({
-                                    otherError: message
-                                })
-                                console.log(message)
-                                break;
-                                default:
+                                    console.log(message)
+                                    this.setState(prevState => ({
+                                        messages: {
+                                            ...prevState.messages,
+                                            [name]: message
+                                        }
+                                    }))
                                     break
-                                }
-                            }
-                        })
-                    }
+                                case 400:
+                                    this.setErrors({
+                                        otherError: message
+                                    })
+                                    console.log(message)
+                                    break;
+                                    default:
+                                        break
+                                    }
+                        }
+                    })
+                })
+            }
+        })
+    }
                     
         onSubmit = (e)=>{
             e.preventDefault();
             
             this.clearAllErrors();
-            // this.applyAuthentication(enrollData);
             
-            this.waitTillStateChange(()=>{
-                if(!this.state.errorsExists){
-                    console.log(this.state)
-                    this.makeRequest() 
-                }
-            })
+            this.makeRequest() 
+            
             
         }
         
@@ -258,6 +272,7 @@ class EnrollToCoursePage extends Component{
                             {this.state.errors.courseExist && <span className="errorMessage">{this.state.errors.courseExist}</span>}
                             <form onSubmit={this.onSubmit} encType="multipart/form-data">
                                 <div>
+                                    <div className="inputErrorDiv">
                                     {
                                             this.state.relatedCourses.map(course =>{
                                                 const { name, department, semester } = course
@@ -276,12 +291,14 @@ class EnrollToCoursePage extends Component{
                                                                 className="Label"
                                                                 htmlFor={name}
                                                             >
-                                                                {name}
+                                                                {name} {this.state.messages[name] && <span className="confirmationMessage" >{this.state.messages[name]}</span>}
                                                             </label>
                                                             </div>
                                                         </div>
                                             })
                                     }
+                                    {this.state.errors.courseError && <span className="errorMessage">{this.state.errors.courseError}</span>}
+                                    </div>
                                 </div>
 
                                 <div>
@@ -301,7 +318,7 @@ class EnrollToCoursePage extends Component{
                                                 onChange={this.onFileInputChange}
                                             />
                                         </div>
-                                        {/* {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>} */}
+                                        {this.state.errors.fileError && <span className="errorMessage">{this.state.errors.fileError}</span>}
                                     </div>
                                 </div>
                                 <button className="Button">

@@ -18,7 +18,7 @@ export const getAndSetTeachers = () => {
         })
         .then(response => response.json())
         .then(response => {
-            // console.log("RESPONSE : ",response)
+            console.log("RESPONSE : ",response)
             response.allTeachers.forEach(teacher => {
                 const { username, name, department, confirmed} = teacher;
                 dispatch(setTeacher(username,name,department,confirmed,"Subject"))
