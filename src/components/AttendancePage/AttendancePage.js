@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { getAndSetTeachers } from '../../actions/teachers';
 import getAndSetCourses from '../../actions/courses';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
+import StudentComponent from './StudentComponent';
 
 import './_attendancePage.scss';
 
@@ -20,15 +21,14 @@ class AttendancePage extends Component{
             FetchingTime : 100 ,
             Data: {
                 classImage: undefined,
-                course: ""
+                courseData: {}
             },
             errorsExists: false,
             errors:{
-                courseError: "",
                 fileError: "",
                 otherError: ""
             },
-            messages: {} 
+            messages: ""
         }
     }
     
@@ -46,17 +46,26 @@ class AttendancePage extends Component{
     }
     
     onInputChange = (e)=>{
-        const name = e.target.id;
+        // const name = e.target.id;
         const value = e.target.value;
+        const { name:teachersName , department } = this.state.currentTeacher; 
+        const relatedCourses = this.getTeacherRelatedCourses(department, teachersName)
+        
+        const currentSelectedCourse = relatedCourses.filter(course => course.name === value)[0]
 
+        const { name, semester } = currentSelectedCourse;
         this.setState((prevState)=>{
             return {
                 Data: {
                     ...prevState.Data, 
-                    [name] : value
+                    courseData: {
+                        name,
+                        department,
+                        semester
+                    }
                  }
             }
-        },()=>{console.log( this.state.Data)})
+        })
     }
 
     setErrors = (toUpdate)=>{
@@ -67,7 +76,7 @@ class AttendancePage extends Component{
                     ...toUpdate
                 }
             }
-        },()=> console.log(this.state.errors))
+        })
         this.setState({errorsExists: true});
     }
     
@@ -81,12 +90,11 @@ class AttendancePage extends Component{
 
     
     applyAuthentication(Data){
-        console.log(Data)
-        // const { courseData} = Data
+        const { classImage } = Data
 
-        // if(classImage === undefined){
-            // this.setErrors({fileError: "Upload a File"})
-        // }
+        if(classImage === undefined){
+            this.setErrors({fileError: "Upload a File"})
+        }
     }
 
     waitTillStateChange(callback){
@@ -99,13 +107,10 @@ class AttendancePage extends Component{
 
     makeRequest = () =>{
         let formData = new FormData();
-        const { classImage, course }  = this.state.Data;
+        const { classImage, courseData }  = this.state.Data;
 
         formData.append('file', classImage)
-        formData.append("course",course);
-
-        console.log(formData.get('file'))
-        console.log(formData.get('course'))
+        formData.append("courseData",JSON.stringify(courseData));
         
         this.applyAuthentication(this.state.Data);
         this.waitTillStateChange(()=>{    
@@ -116,181 +121,207 @@ class AttendancePage extends Component{
                 })
                 .then(response => response.json())
                 .then(response => {
-                    console.log(response)
-
-                        // const { name } = response;
-                        // const { message , status } = response.result;
-                        // console.log(name)
-                        // if(response.status === 200){
-                        //     switch(status){
-                        //         case 201:
-                        //             console.log(message)
-                        //             this.setState(prevState => ({
-                        //                 messages: {
-                        //                     ...prevState.messages,
-                        //                     [name]: message
-                        //                 }
-                        //             }))
-                        //             break;
-                        //         case 409:
-                        //             console.log(message)
-                        //             this.setState(prevState => ({
-                        //                 messages: {
-                        //                     ...prevState.messages,
-                        //                     [name]: message
-                        //                 }
-                        //             }))
-                        //             break
-                        //         case 400:
-                        //             this.setErrors({
-                        //                 otherError: message
-                        //             })
-                        //             console.log(message)
-                        //             break;
-                        //             default:
-                        //                 break
-                        //             }
-                        // }
+                        const { message , status } = response.result;
+                        if(response.status === 200){
+                            switch(status){
+                                case 201:
+                                    console.log(message)
+                                    this.setState(prevState => ({
+                                        messages: message
+                                    }))
+                                    break;
+                                case 400:
+                                    console.log(message)
+                                    this.setState(prevState => ({
+                                        messages: message
+                                    }))
+                                    break
+                                    default:
+                                        break
+                                    }
+                        }
                     })
             }
         })
     }
-                    
-        onSubmit = (e)=>{
-            e.preventDefault();
-            this.clearAllErrors();
-            this.makeRequest() 
-        }
-        
-        getCurrentTeacher = ()=>{
-            const listOfTeachers = this.props.teachers;
-            const currentLoggedInUsername = getUsernameFromCookie();
-            return listOfTeachers.filter(teacher => {
-                return teacher.username === currentLoggedInUsername
-            })[0]
-        }
     
-        getTeacherRelatedCourses = (department, teachersName) => {
-            const listOfCourses = this.props.courses;
-            console.log(listOfCourses);
-            // clearInterval(this.timer);
-            // this.timer = null;
-            return listOfCourses.filter(course => {
-                return course.department === department && course.teacherAssigned === teachersName
-            })
-        }
+    getCurrentStudentAttendance = () => {
+        const relatedCourses = this.state.relatedCourses;
+        const currentCourseName = this.state.Data.courseData.name;
+        const AttendanceArray = relatedCourses.filter(course => course.name === currentCourseName)[0]['attendance']
+        // GET TODAYS DATE
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
 
-        componentDidMount = ()=>{
-            let currentTeacher = this.getCurrentTeacher();
-            console.log(this.props.courses)
-            this.timer = setInterval( () => {
-                currentTeacher = this.getCurrentTeacher();
-                this.setState(prevState => {
-                    return {
-                        currentTeacher
-                    }   
-                },()=>{
-                    if(this.state.currentTeacher){
-                        const relatedCourses = this.getTeacherRelatedCourses(this.state.currentTeacher.department, this.state.currentTeacher.name);
-                        console.log(relatedCourses)
-                        if(relatedCourses){
-                            this.setState(prevState =>{
-                                    return {
-                                        isFetching: true,
-                                        relatedCourses,
-                                        Data: {
-                                            ...prevState.Data,
-                                            course: relatedCourses[0]['name']
+        today = yyyy + '-' + mm + '-' + dd;
+        const todaysAttendance = AttendanceArray.filter(attendance => attendance.date === today )[0]['attendance_on_date']
+
+        this.setState({todaysAttendance},()=> console.log(this.state))
+    }
+    
+    onSubmit = (e)=>{
+        e.preventDefault();
+        this.clearAllErrors();
+        this.makeRequest() 
+
+        /// ATTENDANCE IS DONE
+        this.getCurrentStudentAttendance()
+    }
+    
+    getCurrentTeacher = ()=>{
+        const listOfTeachers = this.props.teachers;
+        const currentLoggedInUsername = getUsernameFromCookie();
+        return listOfTeachers.filter(teacher => {
+            return teacher.username === currentLoggedInUsername
+        })[0]
+    }
+
+    getTeacherRelatedCourses = (department, teachersName) => {
+        const listOfCourses = this.props.courses;
+        return listOfCourses.filter(course => {
+            return course.department === department && course.teacherAssigned === teachersName
+        })
+    }
+
+    componentDidMount = ()=>{
+        let currentTeacher = this.getCurrentTeacher();
+        
+        this.timer = setInterval( () => {
+            currentTeacher = this.getCurrentTeacher();
+            this.setState(prevState => {
+                return {
+                    currentTeacher
+                }   
+            },()=>{
+                if(this.state.currentTeacher){
+                    const relatedCourses = this.getTeacherRelatedCourses(this.state.currentTeacher.department, this.state.currentTeacher.name);
+                    console.log(relatedCourses)
+                    if(relatedCourses){
+                        this.setState(prevState =>{
+                                return {
+                                    isFetching: true,
+                                    relatedCourses,
+                                    Data: {
+                                        ...prevState.Data,
+                                        courseData : {
+                                            "name" : relatedCourses[0]['name'],
+                                            "department" : relatedCourses[0]['department'],
+                                            "semester" : relatedCourses[0]['semester']
                                         }
                                     }
-                                },
-                                ()=> console.log(this.state)
-                            )
-                            clearInterval(this.timer);
-                            this.timer = null;
-                        }
+                                }
+                            },
+                            ()=> console.log(this.state)
+                        )
+                        clearInterval(this.timer);
+                        this.timer = null;
                     }
-                })
-            },this.state.FetchingTime)
-        }
-        
-        render() {
-        if(!this.state.isFetching){
-            return (
-                <div className="Enroll_MainBody sidePage">
-                    <div className="Enroll_Container">
-                        <div className="Enroll_FormContainer">
-                            <header>
-                                <h1>Add Course</h1>
-                            </header>
-                            <form>
-                                <div>
-                                    <p>Fetching ....</p>
-                                </div>
-                            </form>
-                        </div>
+                }
+            })
+        },this.state.FetchingTime)
+    }
+    
+    render() {
+    if(!this.state.isFetching){
+        return (
+            <div className="Enroll_MainBody sidePage">
+                <div className="Enroll_Container">
+                    <div className="Enroll_FormContainer">
+                        <header>
+                            <h1>Add Course</h1>
+                        </header>
+                        <form>
+                            <div>
+                                <p>Fetching ....</p>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            )
-        }else{
-            return (
-                <div className="Enroll_MainBody sidePage">
-                    <div className="Enroll_Container">
-                        <div className="Enroll_FormContainer">
-                            <header>
-                                <h1>
-                                    Enroll<span>({this.state.currentTeacher.roll_no})</span>
-                                </h1>
-                            </header>
-                            {this.state.message && <span className="confirmationMessage">{this.state.message}</span>}
-                            {this.state.errors.courseExist && <span className="errorMessage">{this.state.errors.courseExist}</span>}
-                            <form onSubmit={this.onSubmit} encType="multipart/form-data">
-                                <div>
-                                    <label className="Label" htmlFor="course">Course</label>
-                                    <div className="selectDiv">
-                                        <select 
-                                            id="course"
-                                            name="course"
-                                            onChange={this.onInputChange}
-                                        >
-                                            {
-                                                this.state.relatedCourses.map( course =>{
-                                                    const { name } = course
-                                                    return <option key={name} value={name}>{name}</option>
-                                                })
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label 
-                                        className="Label"
-                                        htmlFor="name"
+            </div>
+        )
+    }else{
+        return (
+            <div className="Enroll_MainBody sidePage">
+                <div className="Enroll_Container">
+                    <div className="Enroll_FormContainer">
+                        <header>
+                            <h1>
+                                Enroll<span>({this.state.currentTeacher.roll_no})</span>
+                            </h1>
+                        </header>
+                        {this.state.messages && <span className="confirmationMessage">{this.state.messages}</span>}
+                        {this.state.errors.courseExist && <span className="errorMessage">{this.state.errors.courseExist}</span>}
+                        <form onSubmit={this.onSubmit} encType="multipart/form-data">
+                            <div>
+                                <label className="Label" htmlFor="course">Course</label>
+                                <div className="selectDiv">
+                                    <select 
+                                        id="course"
+                                        name="course"
+                                        onChange={this.onInputChange}
                                     >
-                                        Upload Image
-                                    </label>
-                                    <div className="inputErrorDiv">
-                                        <div className="inputDiv">
-                                            <input
-                                                type="file"
-                                                id="classImage"
-                                                placeholder=""
-                                                // value={this.state.Data.classImage}
-                                                onChange={this.onFileInputChange}
-                                            />
-                                        </div>
-                                        {this.state.errors.fileError && <span className="errorMessage">{this.state.errors.fileError}</span>}
-                                    </div>
+                                        {
+                                            this.state.relatedCourses.map( course =>{
+                                                const { name } = course
+                                                return <option key={name} value={name}>{name}</option>
+                                            })
+                                        }
+                                    </select>
                                 </div>
-                                <button className="Button">
-                                    make Attendance
-                                </button>
-                            </form>
-                        </div>
+                            </div>
+                            <div>
+                                <label 
+                                    className="Label"
+                                    htmlFor="name"
+                                >
+                                    Upload Image
+                                </label>
+                                <div className="inputErrorDiv">
+                                    <div className="inputDiv">
+                                        <input
+                                            type="file"
+                                            id="classImage"
+                                            placeholder=""
+                                            onChange={this.onFileInputChange}
+                                        />
+                                    </div>
+                                    {this.state.errors.fileError && <span className="errorMessage">{this.state.errors.fileError}</span>}
+                                </div>
+                            </div>
+                            <button className="Button">
+                                make Attendance
+                            </button>
+                        </form>
                     </div>
                 </div>
-            )
-        }
+                <div className="student_ListBlock">
+                <header>
+                    <h2> All Students </h2>
+                </header>
+                {this.state.todaysAttendance && 
+                    <div className="student_MainContainer">
+                        <ol>
+                            {
+                                this.state.todaysAttendance.map(attendance =>{
+                                    const {roll_no, status} = attendance
+                                    return <li 
+                                            key={roll_no}>
+                                                <StudentComponent 
+                                                    roll_no={roll_no}
+                                                        status={status}
+                                                    />
+                                            </li>
+                                })
+                            }
+                        </ol>
+                    </div>
+                }
+            </div>
+            </div>
+        )
+    }
     }
 }
 

@@ -7,11 +7,12 @@ const addCourse = (course)=>{
 
 // Getting From Database and Setting in Redux Store
 
-const getAndSetCourses = ()=>{
+const getAndSetCourses = (filters = {})=>{
     //  console.log("COURSE")
     return (dispatch)=>{
         fetch('http://localhost:5000/get_all_courses',{
-            method: ['POST']
+            method: ['POST'],
+            body: JSON.stringify(filters)
         })
         .then(response => response.json())
         .then(response => {
