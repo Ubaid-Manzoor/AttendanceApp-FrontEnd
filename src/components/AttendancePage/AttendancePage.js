@@ -141,6 +141,9 @@ class AttendancePage extends Component{
                                     }
                         }
                     })
+
+
+                    this.props.setCourses();
             }
         })
     }
