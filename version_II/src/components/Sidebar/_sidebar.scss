@@ -1,0 +1,18 @@
+.sidepane {
+  // flex:3;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #37444c;
+  min-height: 100vh;
+}
+
+.sidepane .sidepaneLogo {
+  display: block;
+  margin: 0.5rem auto;
+  h1{
+    font-family: 'Quicksand', sans-serif; 
+    font-size: 2rem;
+    padding:2rem 0rem;
+  }
+}

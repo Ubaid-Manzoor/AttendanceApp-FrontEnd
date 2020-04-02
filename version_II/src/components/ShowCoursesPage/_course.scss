@@ -1,0 +1,44 @@
+.courseBlock{
+    background-color: #ebebeb;
+    font-family: 'Play', sans-serif;
+    .courseContainer{
+        padding: 1rem 2rem 1rem 2rem;
+        .mainHeader{
+            color:#fff;
+            font-size: 2rem;
+            padding:4rem;
+            text-align: center;
+            background: #333333;
+        }
+    }
+}
+
+.mainBody{
+    padding: 2rem 0 0 0;
+    .courseMainDiv{
+        color: #333333;
+        .courseData{
+            background-color: #ffffff;
+            padding: 0 0 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            header{
+                color:#fff;
+                padding:1rem 2rem 1rem 2rem;
+                background-color:#333333;
+            }
+            .courseBody{
+                padding:1rem 2rem 1rem 2rem;
+                p{
+                    font-size: 1.3rem;
+                    color:#007bff;
+                    span{
+                        color:#333;
+                        font-size: 1rem;
+                    }
+                }
+            }
+        }
+    }
+}
+

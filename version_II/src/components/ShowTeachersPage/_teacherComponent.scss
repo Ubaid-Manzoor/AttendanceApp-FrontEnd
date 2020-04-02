@@ -1,0 +1,32 @@
+.teacher_mainBody{
+    padding: 2rem 0 0 0;
+    .teacherMainDiv{
+        color: #333333;
+        .teacherData{
+            background-color: #ffffff;
+            padding: 0 0 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            header{
+                color:#fff;
+                padding:1rem 2rem 1rem 2rem;
+                background-color:#333333;
+                span{
+                    font-size: 1rem;
+                    color: #ed6663;
+                }
+            }
+            .teacherBody{
+                padding:1rem 2rem 1rem 2rem;
+                p{
+                    font-size: 1.3rem;
+                    color:#007bff;
+                    span{
+                        color:#333;
+                        font-size: 1rem;
+                    }
+                }
+            }
+        }
+    }
+}
