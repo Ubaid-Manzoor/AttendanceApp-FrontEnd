@@ -7,20 +7,27 @@ const addCourse = (course)=>{
 
 // Getting From Database and Setting in Redux Store
 
-const getAndSetCourses = (filters = {})=>{
-    //  console.log("COURSE")
+const getAndSetCourses = (filters={},projection={})=>{
     return (dispatch)=>{
-        fetch('http://localhost:5000/get_all_courses',{
-            method: ['POST'],
-            body: JSON.stringify(filters)
-        })
-        .then(response => response.json())
-        .then(response => {
-            // console.log(response.allCourses)
-            response.allCourses.forEach(course => {
-                // console.log(course)
-                dispatch(addCourse(course))
-            });
+        return new Promise((resolve,reject)=>{
+            fetch('http://localhost:5000/get_all_courses',{
+                method: ['POST'],
+                body: JSON.stringify({
+                    filters,
+                    projection
+                })
+            })
+            .then(response => response.json())
+            .then(response => {
+                response.allCourses.forEach(course => {
+                    dispatch(addCourse(course))
+                });
+                resolve();
+            })
+            .catch(error => {
+                console.log(error);
+                return reject(new Error("Error : ",error));
+            })
         })
     }
 }

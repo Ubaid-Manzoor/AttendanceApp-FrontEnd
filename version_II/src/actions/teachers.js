@@ -1,28 +1,32 @@
 /////////////////////////////// FOR TEACHERS ////////////////////////////////////////
-export const setTeacher = (username,name,department,confirmed,courseAssigned) => ({
+export const setTeacher = (teacher) => ({
     type: 'ADD_TEACHER',
-    teacher: {
-        username,
-        name,
-        department,
-        confirmed,
-        courseAssigned
-    }
+    teacher
 })
 
 
-export const getAndSetTeachers = () => {
+export const getAndSetTeachers = (filters={}, projection={}) => {
+    console.log("Filters : ",filters, "Projection : ", projection);
     return (dispatch) => {
-        fetch("http://localhost:5000/get_all_teachers",{
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(response => {
-            console.log("RESPONSE : ",response)
-            response.allTeachers.forEach(teacher => {
-                const { username, name, department, confirmed} = teacher;
-                dispatch(setTeacher(username,name,department,confirmed,"Subject"))
-            });
+        return new Promise((resolve, reject)=>{
+            fetch("http://localhost:5000/get_all_teachers",{
+                method: 'POST',
+                body: JSON.stringify({
+                    filters,
+                    projection
+                })
+            })
+            .then(response => response.json())
+            .then(response => {
+                response.allTeachers.forEach(teacher => {
+                    // const { username, name, department, confirmed} = teacher;
+                    dispatch(setTeacher(teacher))
+                });
+                resolve();
+            })
+            .catch(error =>{
+                reject(new Error('Error : ',error))
+            })
         })
     }
 }   

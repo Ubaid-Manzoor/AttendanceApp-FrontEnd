@@ -13,8 +13,26 @@ class AttendancePage extends Component{
     constructor(props){
         super(props);
         
-        this.props.setCourses();
-        this.props.setTeachers();
+        this.props.setTeachers({
+            "username": getUsernameFromCookie()
+        },{
+            "name": true,
+            "department": true
+        })
+        .then(() =>{
+            console.log(this.props.teachers)
+            const { name, department } = this.props.teachers[0]
+            this.props.setCourses({
+                "teacherAssigned": name,
+                "department": department
+            },{
+
+            })
+            .then(()=> console.log(this.props.courses))
+        })
+        .catch(error => {
+            console.log(error);
+        })
         
         this.state = {
             isFetching: false,
@@ -337,8 +355,8 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setTeachers : () => dispatch(getAndSetTeachers()),
-        setCourses : () => dispatch(getAndSetCourses())
+        setTeachers : (filters={},projection) => dispatch(getAndSetTeachers(filters,projection)),
+        setCourses : (filters={},projection={}) => dispatch(getAndSetCourses(filters,projection))
     }
 }
 
