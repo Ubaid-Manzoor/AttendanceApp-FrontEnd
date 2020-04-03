@@ -11,29 +11,7 @@ import './_attendancePage.scss';
 
 class AttendancePage extends Component{
     constructor(props){
-        super(props);
-        
-        this.props.setTeachers({
-            "username": getUsernameFromCookie()
-        },{
-            "name": true,
-            "department": true
-        })
-        .then(() =>{
-            console.log(this.props.teachers)
-            const { name, department } = this.props.teachers[0]
-            this.props.setCourses({
-                "teacherAssigned": name,
-                "department": department
-            },{
-
-            })
-            .then(()=> console.log(this.props.courses))
-        })
-        .catch(error => {
-            console.log(error);
-        })
-        
+        super(props);        
         this.state = {
             isFetching: false,
             FetchingTime : 100 ,
@@ -64,14 +42,11 @@ class AttendancePage extends Component{
     }
     
     onInputChange = (e)=>{
-        // const name = e.target.id;
         const value = e.target.value;
-        const { name:teachersName , department } = this.state.currentTeacher; 
-        const relatedCourses = this.getTeacherRelatedCourses(department, teachersName)
-        
-        const currentSelectedCourse = relatedCourses.filter(course => course.name === value)[0]
-
+        const currentSelectedCourse = this.props.courses.filter(course => course.name === value)[0]
+        const { department } = this.props.teachers[0];
         const { name, semester } = currentSelectedCourse;
+
         this.setState((prevState)=>{
             return {
                 Data: {
@@ -131,6 +106,10 @@ class AttendancePage extends Component{
         formData.append("courseData",JSON.stringify(courseData));
         
         this.applyAuthentication(this.state.Data);
+
+        // SETSTATE IS ASNC FUNCTION SO WE NEED TO WAIT UNTILL 
+        //ALL SETSTATE ARE DONE CHANGING STATE
+
         this.waitTillStateChange(()=>{    
             if(!this.state.errorsExists){
                 fetch('http://localhost:5000/initiate_attendence',{
@@ -158,10 +137,8 @@ class AttendancePage extends Component{
                                         break
                                     }
                         }
-                    })
-
-
-                    this.props.setCourses();
+                })
+                this.props.setCourses();
             }
         })
     }
@@ -177,71 +154,82 @@ class AttendancePage extends Component{
         var yyyy = today.getFullYear();
 
         today = yyyy + '-' + mm + '-' + dd;
-        const todaysAttendance = AttendanceArray.filter(attendance => attendance.date === today )[0]['attendance_on_date']
+        let todaysAttendance;
 
+        /// fall to catch if attendance not done yet
+        try{
+            todaysAttendance = AttendanceArray.filter(attendance => attendance.date === today )[0]['attendance_on_date']
+        }catch{
+            todaysAttendance = false;
+        }
         this.setState({todaysAttendance},()=> console.log(this.state))
     }
     
     onSubmit = (e)=>{
         e.preventDefault();
+
+        // CLEAR ALL EXISTING ERROR TO START NEW
         this.clearAllErrors();
+
+        // MAKE REQUEST TO MAKE ATTENDANCE
         this.makeRequest() 
 
-        /// ATTENDANCE IS DONE
+        // DISPLAY ATTENDANCE AFTER IT IS DONE
         this.getCurrentStudentAttendance()
     }
-    
-    getCurrentTeacher = ()=>{
-        const listOfTeachers = this.props.teachers;
-        const currentLoggedInUsername = getUsernameFromCookie();
-        return listOfTeachers.filter(teacher => {
-            return teacher.username === currentLoggedInUsername
-        })[0]
-    }
 
-    getTeacherRelatedCourses = (department, teachersName) => {
-        const listOfCourses = this.props.courses;
-        return listOfCourses.filter(course => {
-            return course.department === department && course.teacherAssigned === teachersName
-        })
-    }
 
     componentDidMount = ()=>{
-        let currentTeacher = this.getCurrentTeacher();
         
-        this.timer = setInterval( () => {
-            currentTeacher = this.getCurrentTeacher();
-            this.setState(prevState => {
-                return {
-                    currentTeacher
-                }   
-            },()=>{
-                if(this.state.currentTeacher){
-                    const relatedCourses = this.getTeacherRelatedCourses(this.state.currentTeacher.department, this.state.currentTeacher.name);
-                    console.log(relatedCourses)
-                    if(relatedCourses){
-                        this.setState(prevState =>{
-                                return {
-                                    isFetching: true,
-                                    relatedCourses,
-                                    Data: {
-                                        ...prevState.Data,
-                                        courseData : {
-                                            "name" : relatedCourses[0]['name'],
-                                            "department" : relatedCourses[0]['department'],
-                                            "semester" : relatedCourses[0]['semester']
-                                        }
+        // CREATE TEACHER FILTERS & PEOJECTION FOR BACKEND USE
+        const teacherFilters = {
+            "username": getUsernameFromCookie()
+        }
+        const teacherProjection = {
+            "name": true,
+            "department": true
+        }
+        
+        // Request will be made to backend with filters & projection 
+        //to get current Teacher
+        this.props.setTeachers(teacherFilters,teacherProjection) //WILL RETURN A PROMISE
+        .then(() =>{
+            const { name, department } = this.props.teachers[0]
+
+        // CREATE COURSE FILTERS & PEOJECTION FOR BACKEND USE
+
+            const courseFilters = {
+                "teacherAssigned": name,
+                "department": department
+            }
+            const courseProjection = {}
+            
+            // Request will be made to backend with filter & projection 
+            //to get course assigned to current Teacher
+            this.props.setCourses(courseFilters,courseProjection) //WILL RETURN A PROMISE
+            .then(()=>{
+                const relatedCourses = this.props.courses;
+                if(relatedCourses){
+                    this.setState(prevState =>{
+                            return {
+                                isFetching: true,
+                                relatedCourses,
+                                Data: {
+                                    ...prevState.Data,
+                                    courseData : {
+                                        "name" : relatedCourses[0]['name'],
+                                        "department" : relatedCourses[0]['department'],
+                                        "semester" : relatedCourses[0]['semester']
                                     }
                                 }
-                            },
-                            ()=> console.log(this.state)
-                        )
-                        clearInterval(this.timer);
-                        this.timer = null;
-                    }
+                            }
+                        })
+
+                        // Show the attendance if already done
+                        this.getCurrentStudentAttendance();
                 }
             })
-        },this.state.FetchingTime)
+        })
     }
     
     render() {
@@ -251,7 +239,7 @@ class AttendancePage extends Component{
                 <div className="Enroll_Container">
                     <div className="Enroll_FormContainer">
                         <header>
-                            <h1>Add Course</h1>
+                            <h1>Attendance</h1>
                         </header>
                         <form>
                             <div>
@@ -269,7 +257,7 @@ class AttendancePage extends Component{
                     <div className="Enroll_FormContainer">
                         <header>
                             <h1>
-                                Enroll<span>({this.state.currentTeacher.roll_no})</span>
+                                Attendance
                             </h1>
                         </header>
                         {this.state.messages && <span className="confirmationMessage">{this.state.messages}</span>}
@@ -325,6 +313,7 @@ class AttendancePage extends Component{
                     <div className="student_MainContainer">
                         <ol>
                             {
+                                this.state.todaysAttendance &&
                                 this.state.todaysAttendance.map(attendance =>{
                                     const {roll_no, status} = attendance
                                     return <li 
