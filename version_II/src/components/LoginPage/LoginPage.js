@@ -1,5 +1,8 @@
 import React , { Component } from 'react'
 import {connect} from 'react-redux'
+import { Redirect } from 'react-router-dom';
+import { getUsernameFromCookie } from '../../helperFunction/getCookie';
+
 // import Cookies from 'universal-cookie';
 // import {loginUser} from '../../actions/user'
 import "./LoginPage.scss";
@@ -174,79 +177,85 @@ class LoginPage extends Component{
 
     //////////////////////////LOGIN HANDLER ENDS //////////////////////////////
     render(){
-        return (
-            <div className="LoginMainBody">
-                <div className="LoginContainer">
-                    <div className="LoginFormContainer">
-                        <header>
-                            <h1>Account Login</h1>
-                        </header>
-                        {this.state.errors.usernameOrPassword && <p className="errorMessage">{this.state.errors.usernameOrPassword}</p>}
-                        <form onSubmit={this.handleSubmit}>
-                            <div>
-                                <label      
-                                    className="usernameLabel"
-                                    htmlFor="username"
-                                >
-                                    USERNAME
-                                </label>
-                                <div className="inputErrorDiv">
-                                    <div className="inputDiv">
-                                        <input 
-                                            type="text"
-                                            id="username"
-                                            placeholder=""
-                                            value={this.state.username}
-                                            onChange={this.onUsernameChange}
-                                        />
-                                    </div>
-                                    {this.state.errors.username && <span>{this.state.errors.username}</span>}
-                                </div>
-                            </div>
-                            <div>
-                                <label 
-                                    className="pwdLabel"
-                                    htmlFor="password"
-                                >
-                                    PASSWORD
-                                </label>
-                                <div className="inputErrorDiv">
-                                    <div className="inputDiv">
-                                        <input 
-                                            type="password"
-                                            id="password"
-                                            placeholder=""
-                                            value={this.state.password}
-                                            onChange={this.onPasswordChange}
-                                        />
-                                    </div>
-                                    {this.state.errors.password && <span>{this.state.errors.password}</span>}
-                                </div>
-                            </div>
-                            <div className="LoginFooter">
-                                <div className="remember-me">
-                                    <input 
-                                        type="checkbox"
-                                        id="remember_me"
-                                    />
-                                    <label 
-                                        htmlFor="remember_me"
+        const loggedIn = !!getUsernameFromCookie();
+        if(!loggedIn){
+            return (
+                <div className="LoginMainBody">
+                    <div className="LoginContainer">
+                        <div className="LoginFormContainer">
+                            <header>
+                                <h1>Account Login</h1>
+                            </header>
+                            {this.state.errors.usernameOrPassword && <p className="errorMessage">{this.state.errors.usernameOrPassword}</p>}
+                            <form onSubmit={this.handleSubmit}>
+                                <div>
+                                    <label      
+                                        className="usernameLabel"
+                                        htmlFor="username"
                                     >
-                                        Remember Me
+                                        USERNAME
                                     </label>
+                                    <div className="inputErrorDiv">
+                                        <div className="inputDiv">
+                                            <input 
+                                                type="text"
+                                                id="username"
+                                                placeholder=""
+                                                value={this.state.username}
+                                                onChange={this.onUsernameChange}
+                                            />
+                                        </div>
+                                        {this.state.errors.username && <span>{this.state.errors.username}</span>}
+                                    </div>
                                 </div>
-
-                                <div>Forgot Password?</div>   
-                            </div>
-
-                            <button className="LoginButton">
-                                Login
-                            </button>
-                        </form>
+                                <div>
+                                    <label 
+                                        className="pwdLabel"
+                                        htmlFor="password"
+                                    >
+                                        PASSWORD
+                                    </label>
+                                    <div className="inputErrorDiv">
+                                        <div className="inputDiv">
+                                            <input 
+                                                type="password"
+                                                id="password"
+                                                placeholder=""
+                                                value={this.state.password}
+                                                onChange={this.onPasswordChange}
+                                            />
+                                        </div>
+                                        {this.state.errors.password && <span>{this.state.errors.password}</span>}
+                                    </div>
+                                </div>
+                                <div className="LoginFooter">
+                                    <div className="remember-me">
+                                        <input 
+                                            type="checkbox"
+                                            id="remember_me"
+                                        />
+                                        <label 
+                                            htmlFor="remember_me"
+                                        >
+                                            Remember Me
+                                        </label>
+                                    </div>
+    
+                                    <div>Forgot Password?</div>   
+                                </div>
+    
+                                <button className="LoginButton">
+                                    Login
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )
+            )
+
+        }else{
+            return <Redirect to="/" />
+        }
     }
 }
 

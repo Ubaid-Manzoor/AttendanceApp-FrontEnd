@@ -4,13 +4,12 @@ import { getAndSetDepartments } from '../../actions/department';
 
 import DepartmentComponent from './DepartmentComponent';
 
-import  './_DepartmentPage.scss';
+import  './_addDepartmentPage.scss';
 
-class DepartmentPage extends Component{
+class AddDepartmentPage extends Component{
     constructor(props){
         super(props);
 
-        this.props.setDepartments();
         this.state = {
             departmentData: {
                 departmentName: ""
@@ -25,6 +24,8 @@ class DepartmentPage extends Component{
         }
     }
 
+    //////////////////////////  INPUT HANDLERS //////////////////////////
+
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
@@ -37,6 +38,11 @@ class DepartmentPage extends Component{
             }
         })
     }
+
+    //////////////////////////  INPUT HANDLERS ENDS //////////////////////////
+
+
+    ////////////////////////// ERROR HANDLER /////////////////////////////////
 
     setErrors = (toUpdate)=>{
         this.setState((prevState) =>{
@@ -66,6 +72,12 @@ class DepartmentPage extends Component{
         }
     }
 
+    ////////////////////////// ERROR HANDLER ENDS /////////////////////////////////
+
+
+    /////////////////////////  REQUEST RELATED FUNCTIONS /////////////////////////
+
+
     waitTillStateChange(callback){
         this.setState(state => state,()=>{
                 callback()
@@ -78,6 +90,7 @@ class DepartmentPage extends Component{
         e.preventDefault();
 
         const departmentData = this.state.departmentData;
+        console.log(departmentData);
 
         this.clearAllErrors();
         this.applyAuthentication(departmentData);
@@ -127,8 +140,18 @@ class DepartmentPage extends Component{
 
     }
 
+
+    /////////////////////////  REQUEST RELATED FUNCTIONS ENDS /////////////////////////
+
+
+    componentDidMount = ()=>{
+        this.props.setDepartments();
+    }
+
+
     render() {
         const listOfDepartments = this.props.departments;
+
         return (
             <div className="department_MainBody sidePage">
                 <div className="department_Container">
@@ -172,6 +195,7 @@ class DepartmentPage extends Component{
                         <div className="teacher_MainContainer">
                             <ol>
                                 {
+                                    !!listOfDepartments &&
                                     listOfDepartments.map(department =>{
                                         const { name } = department; 
                                         return <li key={name}><DepartmentComponent name={name}  /></li>
@@ -193,9 +217,9 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setDepartments : () => dispatch(getAndSetDepartments())
+        setDepartments : (filters,projection) => dispatch(getAndSetDepartments(filters,projection))
     }
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(DepartmentPage);
+export default connect(mapStateToProps,mapDispatchToProps)(AddDepartmentPage);
 

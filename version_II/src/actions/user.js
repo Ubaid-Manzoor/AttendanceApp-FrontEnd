@@ -1,31 +1,39 @@
 /////////////////////////// FOR  ALL USERS ////////////////////////////////////
 
-export const setUser = (username,password,role) => ({
+export const setUser = (user) => ({
   type: 'SET_USER',
-  user:{
-    username,
-    password,
-    role
-  }
+  user
 })
 
 export const getAndSetUser = ((username)=>{
   return (dispatch)=>{
-        fetch('http://localhost:5000/get_user',{
-          method: 'POST',
-          headers:{
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            username
+        return new Promise((resolve, reject)=>{
+          fetch('http://localhost:5000/get_user',{
+            method: 'POST',
+            headers:{
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              username
+            })
           })
-        })
-        .then(response => response.json())
-        .then(data => {
-          // console.log(data)
-          const { _id:name, password, role} = data;
-          // console.log("NAME: ",name)
-          dispatch(setUser(name,password,role))
+          .then(response => response.json())
+          .then(user => {
+            // RENAME ID TO USERNAME 
+            user['username'] = user['_id']
+            /* 
+              REMOVE PASSWORD BECAUSE WE DONT 
+              NEED PASSWORD IN FRONTEND
+              AND PASSWORD SHOULD NOT BE SAVED IN COOKIES
+            */
+            delete user['password']
+            dispatch(setUser(user))
+
+            resolve();
+          })
+          .catch(error => {
+            reject(error);
+          })
         })
   }
 })

@@ -1,25 +1,17 @@
 import React, {Component} from 'react'
 import { connect } from 'react-redux';
-// import { Redirect } from 'react-router';
-// import jwt from 'jwt-decode';
 
 import { Link } from 'react-router-dom';
 
 import './_afterSigninLinks.scss'
-// import JwtDecode from 'jwt-decode';
 import logout from '../../helperFunction/logout';
 
+import { getRoleFromCookie } from '../../helperFunction/getCookie';
+ 
 
 class AfterSigninLinks extends Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      userRole:props.userRole
-    }
-  }
-
-
   render(){
+    const userRole = getRoleFromCookie();
     return(
       <div className="after-signin-nav">
         <div className="user-profile-div">
@@ -30,21 +22,21 @@ class AfterSigninLinks extends Component{
         </div>
         <div className="sidepane-nav">
           <div className='navigation'>
-            { this.state.userRole === 'student' && 
+            { userRole === 'student' && 
               <React.Fragment>
                 <Link to="/enroll" className='navigation-item'>Enroll To Course</Link>
                 <Link to="/attendance" className='navigation-item'>Attendance</Link>
               </React.Fragment>
             }
             { 
-              this.state.userRole === 'teacher' &&
+              userRole === 'teacher' &&
               <React.Fragment>
                 <Link to="/attendance" className='navigation-item'>Attendance</Link>
                 <Link to="/message" className="navigation-item">Message</Link>
               </React.Fragment>
             }
             {
-              this.state.userRole === 'admin' && 
+              userRole === 'admin' && 
               <React.Fragment>
                 <Link to="/department" className="navigation-item">Add Department</Link>
                 <Link to="/addCourse" className="navigation-item">Add Course</Link>

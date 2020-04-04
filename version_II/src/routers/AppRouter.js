@@ -15,7 +15,7 @@ import MessagePage from '../components/MessagePage';
 import AddCoursePage from '../components/AddCoursePage';
 import ShowCoursesPage from '../components/ShowCoursesPage';
 import ShowTeachersPage from '../components/ShowTeachersPage';
-import DepartmentPage from '../components/DepartmentPage';
+import AddDepartmentPage from '../components/AddDepartmentPage';
 import EnrollToCoursePage from '../components/EnrollToCoursePage';
 
 import _404Page from '../components/_404Page';
@@ -43,8 +43,8 @@ class AppRouter extends Component{
             <Route path="/addStudent" component={ AddStudentPage } />
             <Route path="/addCourse" component={ AddCoursePage } />
             <Route path="/showTeachers" component={ ShowTeachersPage } />
-            <Route path="/showCourses" component={ShowCoursesPage} />
-            <Route path="/department" component={DepartmentPage} />
+            <Route path="/showCourses" component={ ShowCoursesPage } />
+            <Route path="/department" component={ AddDepartmentPage } />
             <Route path="/enroll" component={EnrollToCoursePage} />
             <Route component={ _404Page }></Route>
           </Switch>
