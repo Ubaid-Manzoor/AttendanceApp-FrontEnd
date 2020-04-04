@@ -10,8 +10,7 @@ class AddTeacherPage extends Component{
     constructor(props){
         super(props);
 
-        this.props.setTeachers();
-        this.props.setDepartments();
+        
         // console.log("CALLED")
 
         this.state = {
@@ -35,6 +34,8 @@ class AddTeacherPage extends Component{
         }
     }
 
+    /////////////////////   INPUT HANDLERS ///////////////////////////
+
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
@@ -47,6 +48,13 @@ class AddTeacherPage extends Component{
             }
         })
     }
+
+    /////////////////////   INPUT HANDLERS ENDS ///////////////////////////
+
+
+
+    /////////////////////   ERRORS HANDLERS ///////////////////////////
+
 
     setErrors = (toUpdate)=>{
         this.setState((prevState) =>{
@@ -90,6 +98,13 @@ class AddTeacherPage extends Component{
         }
 
     }
+
+    /////////////////////   ERRORS HANDLERS ENDS ///////////////////////////
+
+
+
+    //////////////////////  REQUEST RELATED FUNCTONS ///////////////////////////
+
 
     waitTillStateChange(callback){
         this.setState(state => state,()=>{
@@ -163,10 +178,29 @@ class AddTeacherPage extends Component{
 
     }
 
+    //////////////////////  REQUEST RELATED FUNCTONS ENDS ///////////////////////////
+
+
+
+    ///////////////////// LIFE CYCLE FUNCTION ////////////////////////////////////////
+
+    componentDidMount = ()=>{
+        /***********************************************************/
+        /* 
+            FOR NOW I WILL FETCH ALL TEACHERS
+            IN FUTURE I WILL FETCH FOR  A PARTICULAR SEMESTER AND DEPARTMENT
+        */
+       this.props.setTeachers()
+       this.props.setDepartments();
+    }
+
+    ///////////////////// LIFE CYCLE FUNCTION ENDS ////////////////////////////////////////
+
+
     render() {
         const listOfTeachers = this.props.teachers;
         const listOfDepartments = this.props.departments;
-        console.log(listOfDepartments);
+
         return (
             <div className="AddTeacher_MainBody sidePage">
                 <div className="AddTeacher_Container">
@@ -226,7 +260,7 @@ class AddTeacherPage extends Component{
                                         value={this.state.teacherData.department}
                                         onChange={this.onInputChange}
                                     >
-                                        {
+                                        {   !!listOfDepartments &&
                                             listOfDepartments.map( department =>{
                                                 const { name } = department
                                                 return <option key={name} value={name}>{name}</option>
@@ -311,8 +345,8 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setTeachers : () => dispatch(getAndSetTeachers()),
-        setDepartments: () => dispatch(getAndSetDepartments())
+        setTeachers : (filters,projection) => dispatch(getAndSetTeachers(filters,projection)),
+        setDepartments: (filters,projection) => dispatch(getAndSetDepartments(filters,projection))
     }
 }
 

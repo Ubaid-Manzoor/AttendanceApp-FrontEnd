@@ -11,8 +11,6 @@ class AddCoursePage extends Component{
     constructor(props){
         super(props);
 
-        // this.props.setTeachers();
-        // this.props.setDepartments();
         this.state = {
             courseData: {
                 name: "",
