@@ -11,8 +11,8 @@ class AddCoursePage extends Component{
     constructor(props){
         super(props);
 
-        this.props.setTeachers();
-        this.props.setDepartments();
+        // this.props.setTeachers();
+        // this.props.setDepartments();
         this.state = {
             courseData: {
                 name: "",
@@ -30,9 +30,23 @@ class AddCoursePage extends Component{
         }
     }
 
+
+    /////////////////// INPUT HANDLERS /////////////////////////////
+
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
+
+
+        // FETCH ONLY TEACHER OF CORRESPONDING DEPARTMENT
+        if(name === "department"){
+            const teacherFilters = {
+                "department": value
+            };
+            const teacherProjection = {};
+            this.props.setTeachers(teacherFilters,teacherProjection);
+        }
+
         this.setState((prevState)=>{
             return {
                 courseData: {
@@ -42,6 +56,11 @@ class AddCoursePage extends Component{
             }
         })
     }
+
+    /////////////////////// INPUT HANDLERS ENDS //////////////////////
+
+
+    /////////////////////// ERROR HANDLERS //////////////////////////
 
     setErrors = (toUpdate)=>{
         this.setState((prevState) =>{
@@ -64,12 +83,15 @@ class AddCoursePage extends Component{
         this.setState({errorsExists: false});
     }
 
-
     applyAuthentication(courseData){
         if(courseData.name === ''){
             this.setErrors({name: "Fill the box"})
         }
     }
+
+    /////////////////////// ERROR HANDLERS ENDS ////////////////////////
+
+
 
     waitTillStateChange(callback){
         this.setState(state => state,()=>{
@@ -77,6 +99,8 @@ class AddCoursePage extends Component{
             }
         )
     }
+
+    /////////////////////// REQUEST RELATED FUNCTIONS //////////////////////
 
     makeRequest = (courseData) =>{
         console.log(courseData)
@@ -140,9 +164,43 @@ class AddCoursePage extends Component{
 
     }
 
+
+    /////////////////////// REQUEST RELATED FUNCTIONS ENDS //////////////////////
+
+
+    ////////////////////// LIFE CYCLE FUNCTIONS /////////////////////////////////
+
+    componentDidMount = ()=>{
+        console.log("CALLED!!");
+
+        // AFTER COMPONENT MOUNT INSTANTLY GET ALL DEPARTMENT
+        this.props.setDepartments()
+        .then(()=>{
+
+            // SET A DEFAULT DEPARTMENT IN STATE
+            const defaultDepartment = this.props.departments[0].name;
+            this.setState((prevState) =>({
+                "courseData":{
+                    ...prevState.courseData,
+                    "department": defaultDepartment
+                }
+            }))
+
+            const teacherFilters = {
+                "department": defaultDepartment
+            }
+            const teacherProjection = {}
+            this.props.setTeachers(teacherFilters, teacherProjection)
+            
+        })
+    }
+
+    ////////////////////// LIFE CYCLE FUNCTIONS ENDS /////////////////////////////////
+
     render() {
         const listOfDepartments = this.props.departments;
         const listOfTeachers = this.props.teachers;
+
         return (
             <div className="MainBody sidePage">
                 <div className="Container">
@@ -174,24 +232,6 @@ class AddCoursePage extends Component{
                                 </div>
                             </div>
                             <div>
-                                <label className="Label" htmlFor="teacher">Teacher Assigned</label>
-                                <div className="selectDiv">
-                                    <select 
-                                        id="teacherAssigned"
-                                        name="teacher"
-                                        value={this.state.courseData.teacher}
-                                        onChange={this.onInputChange}
-                                    >
-                                        {
-                                            listOfTeachers.map( teacher =>{
-                                                const { name } = teacher
-                                                return <option key={name} value={name}>{name}</option>
-                                            })
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
                                 <label className="Label" htmlFor="department">Department</label>
                                 <div className="selectDiv">
                                     <select 
@@ -201,8 +241,28 @@ class AddCoursePage extends Component{
                                         onChange={this.onInputChange}
                                     >
                                         {
+                                            !!listOfDepartments &&
                                             listOfDepartments.map( department =>{
                                                 const { name } = department
+                                                return <option key={name} value={name}>{name}</option>
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="Label" htmlFor="teacher">Teacher Assigned</label>
+                                <div className="selectDiv">
+                                    <select 
+                                        id="teacherAssigned"
+                                        name="teacher"
+                                        value={this.state.courseData.teacher}
+                                        onChange={this.onInputChange}
+                                    >
+                                        {
+                                            !!listOfTeachers &&
+                                            listOfTeachers.map( teacher =>{
+                                                const { name } = teacher
                                                 return <option key={name} value={name}>{name}</option>
                                             })
                                         }
@@ -240,6 +300,8 @@ class AddCoursePage extends Component{
     }
 }
 
+////////////////////// STUFF RELATED TO REDUX STORE /////////////////////
+
 const mapStateToProps = (state)=>{
     return {
         departments: state.departments,
@@ -249,9 +311,12 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setTeachers : () => dispatch(getAndSetTeachers()),
-        setDepartments: () => dispatch(getAndSetDepartments())
+        setTeachers : (filters,projection) => dispatch(getAndSetTeachers(filters,projection)),
+        setDepartments: (filters,projection) => dispatch(getAndSetDepartments(filters,projection))
     }
 }
+
+////////////////////// STUFF RELATED TO REDUX STORE ENDS /////////////////////
+
 
 export default connect(mapStateToProps,mapDispatchToProps)(AddCoursePage);

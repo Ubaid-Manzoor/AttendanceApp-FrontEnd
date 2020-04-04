@@ -109,7 +109,6 @@ class AttendancePage extends Component{
 
         // SETSTATE IS ASNC FUNCTION SO WE NEED TO WAIT UNTILL 
         //ALL SETSTATE ARE DONE CHANGING STATE
-
         this.waitTillStateChange(()=>{    
             if(!this.state.errorsExists){
                 fetch('http://localhost:5000/initiate_attendence',{
@@ -313,7 +312,6 @@ class AttendancePage extends Component{
                     <div className="student_MainContainer">
                         <ol>
                             {
-                                this.state.todaysAttendance &&
                                 this.state.todaysAttendance.map(attendance =>{
                                     const {roll_no, status} = attendance
                                     return <li 

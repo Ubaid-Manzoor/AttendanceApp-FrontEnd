@@ -30,6 +30,9 @@ const teacherReducer = (state = teacherReducerDefaultState, action) =>{
                 }
             })
             return updatedState
+
+        case 'CLEAR_TEACHERS':
+            return []
         default:
             return state;
     }

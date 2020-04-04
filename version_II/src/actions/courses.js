@@ -25,8 +25,7 @@ const getAndSetCourses = (filters={},projection={})=>{
                 resolve();
             })
             .catch(error => {
-                console.log(error);
-                return reject(new Error("Error : ",error));
+                reject(error);
             })
         })
     }

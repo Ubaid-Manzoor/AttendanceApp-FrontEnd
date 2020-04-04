@@ -4,6 +4,10 @@ export const setTeacher = (teacher) => ({
     teacher
 })
 
+const clearTeachers = () => ({
+    type: 'CLEAR_TEACHERS'
+})
+
 
 export const getAndSetTeachers = (filters={}, projection={}) => {
     console.log("Filters : ",filters, "Projection : ", projection);
@@ -18,14 +22,14 @@ export const getAndSetTeachers = (filters={}, projection={}) => {
             })
             .then(response => response.json())
             .then(response => {
+                dispatch(clearTeachers());
                 response.allTeachers.forEach(teacher => {
-                    // const { username, name, department, confirmed} = teacher;
-                    dispatch(setTeacher(teacher))
+                    dispatch(setTeacher(teacher));
                 });
                 resolve();
             })
             .catch(error =>{
-                reject(new Error('Error : ',error))
+                reject(error);
             })
         })
     }
