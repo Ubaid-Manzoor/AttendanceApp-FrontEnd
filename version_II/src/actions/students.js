@@ -1,30 +1,33 @@
 /////////////////////////////// FOR TEACHERS ////////////////////////////////////////
 export const setStudent = (student) => ({
     type: 'ADD_STUDENT',
-    student: {
-        // username,
-        // name,
-        // department,
-        // semester,
-        // confirmed
-        ...student
-    }
+    student
 })
 
 
-export const getAndSetStudents = () => {
+export const getAndSetStudents = (filters={},projection={}) => {
     return (dispatch) => {
-        fetch("http://localhost:5000/get_all_students",{
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(response => {
-            console.log("RESPONSE STUDENTS : ",response)
-            
-            response.allStudents.forEach(student => {
-                // const { username, name, department, semester, confirmed } = student;
-                dispatch(setStudent(student))
-            });
+        return new Promise((resolve,reject)=>{
+            fetch("http://localhost:5000/get_all_students",{
+                method: 'POST',
+                body: JSON.stringify({
+                    filters,
+                    projection
+                })
+            })
+            .then(response => response.json())
+            .then(response => {
+                console.log("RESPONSE STUDENTS : ",response)
+                
+                response.allStudents.forEach(student => {
+                    dispatch(setStudent(student))
+                });
+
+                resolve();
+            })
+            .catch((error)=>{
+                reject(error);
+            })
         })
     }
 }   

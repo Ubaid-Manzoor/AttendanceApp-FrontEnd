@@ -6,8 +6,10 @@ import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 import './_dashboard.scss';
 
 class Dashboard extends Component{
+
   render(){
     const logginStatus = !!getUsernameFromCookie();
+    
     if(logginStatus){
       return(
         <div className="dashboard-container">

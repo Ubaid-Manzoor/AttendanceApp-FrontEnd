@@ -14,6 +14,8 @@ const courseReducer = (state = courseReducerDefaultState, action) =>{
             }else{
                 return state
             }
+        case 'CLEAR_COURSES':
+            return []
         default:
             return state;
     }

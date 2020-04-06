@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 
 // import Cookies from 'universal-cookie';
-// import {loginUser} from '../../actions/user'
+import { setUser } from '../../actions/user'
 import "./LoginPage.scss";
 // import {startLoginUser} from  "../../actions/user";
 import Cookies from 'universal-cookie';
@@ -37,28 +37,18 @@ class LoginPage extends Component{
 
 
     ////////////////////////////////// INPUT HANDLERS ///////////////////////////
-    onUsernameChange = (e)=>{
-        const username = e.target.value
-        this.setState((prevState)=>{
-            return {
-                user_data: {
-                    ...prevState.user_data,
-                    username
-                }
-            }
-        });
-    }
 
-    onPasswordChange = (e)=>{
-        const password = e.target.value
+    onInputChange = (e)=>{
+        const value = e.target.value;
+        const name = e.target.id;
         this.setState((prevState)=>{
             return {
                 user_data: {
                     ...prevState.user_data,
-                    password
+                    [name]:value
                 }
             }
-        });
+        })
     }
 
     ////////////////////////////////// INPUT HANDLERS ENDS ///////////////////////////////
@@ -114,11 +104,9 @@ class LoginPage extends Component{
     ////////////////////SETSTATE CALLBACK END//////////////////////////////
 
     setCookies = (username,role) =>{
-        console.log("Setting Cookies: ",username," ",role)
         const cookies = new Cookies();
         cookies.set("username",username);
         cookies.set("role",role);
-        // console.log(cookies.getAll());
     }
 
 
@@ -151,7 +139,13 @@ class LoginPage extends Component{
                         switch(status){
                             case 200:
                                 const { username,role } = response.result.data;
+
+                                // SET THE COOKIES TO BE USED TO CHECK 
+                                //IF & WHICH USER IF LOGGEDIN 
                                 this.setCookies(username,role);
+
+                                // USED TO RE-RENDER SIDEBAR WHILE LOGIN  
+                                this.props.setUser(response.result.data);
                                 this.props.history.push('/');
                                 break;
                             case 401:
@@ -202,7 +196,7 @@ class LoginPage extends Component{
                                                 id="username"
                                                 placeholder=""
                                                 value={this.state.username}
-                                                onChange={this.onUsernameChange}
+                                                onChange={this.onInputChange}
                                             />
                                         </div>
                                         {this.state.errors.username && <span>{this.state.errors.username}</span>}
@@ -222,7 +216,7 @@ class LoginPage extends Component{
                                                 id="password"
                                                 placeholder=""
                                                 value={this.state.password}
-                                                onChange={this.onPasswordChange}
+                                                onChange={this.onInputChange}
                                             />
                                         </div>
                                         {this.state.errors.password && <span>{this.state.errors.password}</span>}
@@ -264,6 +258,12 @@ const mapStateToProps = (state) => {
       user: state.user
     };
   };
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setUser : (user)=> dispatch(setUser(user))
+    }
+}
   
-export default connect(mapStateToProps)(LoginPage);
+export default connect(mapStateToProps,mapDispatchToProps)(LoginPage);
   

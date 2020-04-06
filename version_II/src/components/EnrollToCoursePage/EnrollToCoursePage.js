@@ -30,6 +30,9 @@ class EnrollToCoursePage extends Component{
             messages: {} 
         }
     }
+
+
+    ///////////////////////// INPUT HANDLERS //////////////////////////////
     
     onFileInputChange = (e) => {
         const value = e.target.files[0];
@@ -61,6 +64,11 @@ class EnrollToCoursePage extends Component{
         },()=>{console.log( this.state.enrollData.courseData)})
     }
 
+    ///////////////////////// INPUT HANDLERS ENDS//////////////////////////////
+
+
+    ///////////////////////// ERROR HANDLERS //////////////////////////////////
+
     setErrors = (toUpdate)=>{
         this.setState((prevState) =>{
             return {
@@ -85,10 +93,8 @@ class EnrollToCoursePage extends Component{
     applyAuthentication(enrollData){
         console.log(enrollData)
         const { courseData, studentImage } = enrollData
-        // courseData.va.forEach(course => {
-            // if(course)
-        // })
         let courseDataError = true
+
         for( const key in courseData){
             if(courseData[key]){ courseDataError = false}
         }
@@ -100,6 +106,10 @@ class EnrollToCoursePage extends Component{
             this.setErrors({fileError: "Upload a File"})
         }
     }
+
+
+    ///////////////////////// ERROR HANDLERS ENDS//////////////////////////////////
+
 
     waitTillStateChange(callback){
         this.setState(state => state,()=>{
@@ -170,77 +180,91 @@ class EnrollToCoursePage extends Component{
         })
     }
                     
-        onSubmit = (e)=>{
-            e.preventDefault();
-            
-            this.clearAllErrors();
-            
-            this.makeRequest() 
-            
-            
-        }
+    onSubmit = (e)=>{
+        e.preventDefault();
         
-        getCurrentStudent = ()=>{
-            const listOfStudents = this.props.students;
-            const currentLoggedInUsername = getUsernameFromCookie();
-            return listOfStudents.filter(student => {
-                return student.username === currentLoggedInUsername
-            })[0]
-        }
+        this.clearAllErrors();
+        
+        this.makeRequest() 
+        
+        
+    }
     
-        getStudentRelatedCourses = (department, semester) => {
-            const listOfCourses = this.props.courses;
-            return listOfCourses.filter(course => {
-                return course.department === department && course.semester === semester
-            })
+    getCurrentStudent = ()=>{
+        const listOfStudents = this.props.students;
+        const currentLoggedInUsername = getUsernameFromCookie();
+        return listOfStudents.filter(student => {
+            return student.username === currentLoggedInUsername
+        })[0]
+    }
+
+    getStudentRelatedCourses = (department, semester) => {
+        const listOfCourses = this.props.courses;
+        return listOfCourses.filter(course => {
+            return course.department === department && course.semester === semester
+        })
+    }
+
+    componentDidMount = ()=>{
+
+        let currentStudent = this.getCurrentStudent();
+        console.log(currentStudent)
+
+        const studentFilters = {
+            username: getUsernameFromCookie()
         }
 
-        componentDidMount = ()=>{
-            let currentStudent = this.getCurrentStudent();
+        const studentProjection = {}
+        this.props.setStudents(studentFilters,studentProjection)
+        .then(()=>{
+            console.log("AFTER FETCH :: ",this.props.students);
+        })
+        // currentStudent = this.props.
+        this.timer = setInterval( () => {
+            currentStudent = this.getCurrentStudent();
+            console.log("CURRENT STU :: ",currentStudent);
+            this.setState(prevState => {
+                return {
+                    currentStudent
+                }   
+            },()=>{
+                if(this.state.currentStudent){
+                    const relatedCourses = this.getStudentRelatedCourses(this.state.currentStudent.department, this.state.currentStudent.semester);
+                    console.log("RELATED COURSES :: ",relatedCourses);
+                    if(relatedCourses){
+                        ///////////////  SETTING STATE FOR EACH COURSE //////////////////
 
-            this.timer = setInterval( () => {
-                currentStudent = this.getCurrentStudent();
-                this.setState(prevState => {
-                    return {
-                        currentStudent
-                    }   
-                },()=>{
-                    if(this.state.currentStudent){
-                        const relatedCourses = this.getStudentRelatedCourses(this.state.currentStudent.department, this.state.currentStudent.semester);
-                        if(relatedCourses){
-                            ///////////////  SETTING STATE FOR EACH COURSE //////////////////
-
-                            relatedCourses.forEach(course => {
-                                this.setState(prevState => {
-                                    return {
-                                        enrollData: {
-                                            ...prevState.enrollData, 
-                                            courseData : {
-                                                ...prevState.enrollData.courseData,
-                                                [course.name] : false
-                                            }
-                                         }
-                                    }
-                                })
-                            });
-
-                            ////////////////////////// END /////////////////////////////////
-                            this.setState(prevState =>{
-                                    return {
-                                        isFetching: true,
-                                        relatedCourses
-                                    }
+                        relatedCourses.forEach(course => {
+                            this.setState(prevState => {
+                                return {
+                                    enrollData: {
+                                        ...prevState.enrollData, 
+                                        courseData : {
+                                            ...prevState.enrollData.courseData,
+                                            [course.name] : false
+                                        }
+                                        }
                                 }
-                            )
-                            clearInterval(this.timer);
-                            this.timer = null;
-                        }
+                            })
+                        });
+
+                        ////////////////////////// END /////////////////////////////////
+                        this.setState(prevState =>{
+                                return {
+                                    isFetching: true,
+                                    relatedCourses
+                                }
+                            }
+                        )
+                        clearInterval(this.timer);
+                        this.timer = null;
                     }
-                })
-            },this.state.FetchingTime)
-        }
+                }
+            })
+        },this.state.FetchingTime)
+    }
         
-        render() {
+    render() {
         if(!this.state.isFetching){
             return (
                 <div className="Enroll_MainBody sidePage">
@@ -342,8 +366,8 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return{
-        setStudents : () => dispatch(getAndSetStudents()),
-        setCourses : () => dispatch(getAndSetCourses())
+        setStudents : (filters,projection) => dispatch(getAndSetStudents(filters,projection)),
+        setCourses : (filters,projection) => dispatch(getAndSetCourses(filters,projection))
     }
 }
 

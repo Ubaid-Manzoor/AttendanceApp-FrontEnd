@@ -19,9 +19,9 @@ if(user){
   store.dispatch(getAndSetUser(getUsernameFromCookie()))
 }
 
-// store.subscribe(()=>{
-//   // console.log(store.getState());
-// })
+store.subscribe(()=>{
+  // console.log(store.getState());
+})
 
 const jsx = (
 <Provider store={store}>
