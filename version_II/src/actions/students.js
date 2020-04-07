@@ -5,6 +5,10 @@ export const setStudent = (student) => ({
 })
 
 
+const clearStudents = ()=> ({
+    type: 'CLEAR_STUDENTS'
+})
+
 export const getAndSetStudents = (filters={},projection={}) => {
     return (dispatch) => {
         return new Promise((resolve,reject)=>{
@@ -18,7 +22,7 @@ export const getAndSetStudents = (filters={},projection={}) => {
             .then(response => response.json())
             .then(response => {
                 console.log("RESPONSE STUDENTS : ",response)
-                
+                dispatch(clearStudents());
                 response.allStudents.forEach(student => {
                     dispatch(setStudent(student))
                 });

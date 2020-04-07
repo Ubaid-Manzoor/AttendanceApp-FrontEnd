@@ -11,10 +11,6 @@ import './_enrollToCoursePage.scss';
 class EnrollToCoursePage extends Component{
     constructor(props){
         super(props);
-        
-        this.props.setCourses();
-        this.props.setStudents();
-        
         this.state = {
             isFetching: false,
             FetchingTime : 100 ,
@@ -61,7 +57,7 @@ class EnrollToCoursePage extends Component{
                     }
                  }
             }
-        },()=>{console.log( this.state.enrollData.courseData)})
+        })
     }
 
     ///////////////////////// INPUT HANDLERS ENDS//////////////////////////////
@@ -111,6 +107,9 @@ class EnrollToCoursePage extends Component{
     ///////////////////////// ERROR HANDLERS ENDS//////////////////////////////////
 
 
+    //////////////////////// REQUEST RELATED FUNCTIONS ////////////////////////////
+
+
     waitTillStateChange(callback){
         this.setState(state => state,()=>{
             callback()
@@ -125,11 +124,8 @@ class EnrollToCoursePage extends Component{
 
         formData.append('file', studentImage)
         formData.append("courseData",JSON.stringify(courseData));
-        formData.append("roll_no",this.state.currentStudent.roll_no)
+        formData.append("roll_no",this.props.students[0].roll_no)
 
-        // for(var pair of formData.entries()) {
-        //     console.log(pair[0]+ ', '+ pair[1]); 
-        // }
         this.applyAuthentication(this.state.enrollData);
         this.waitTillStateChange(()=>{    
             if(!this.state.errorsExists){
@@ -139,11 +135,9 @@ class EnrollToCoursePage extends Component{
                 })
                 .then(response => response.json())
                 .then(responseArray => {
-                    console.log(responseArray)
                     responseArray.forEach(response => {
                         const { name } = response;
                         const { message , status } = response.result;
-                        console.log(name)
                         if(response.status === 200){
                             switch(status){
                                 case 201:
@@ -190,78 +184,65 @@ class EnrollToCoursePage extends Component{
         
     }
     
-    getCurrentStudent = ()=>{
-        const listOfStudents = this.props.students;
-        const currentLoggedInUsername = getUsernameFromCookie();
-        return listOfStudents.filter(student => {
-            return student.username === currentLoggedInUsername
-        })[0]
-    }
-
-    getStudentRelatedCourses = (department, semester) => {
-        const listOfCourses = this.props.courses;
-        return listOfCourses.filter(course => {
-            return course.department === department && course.semester === semester
-        })
-    }
+    //////////////////////// REQUEST RELATED FUNCTIONS ENDS////////////////////////////
 
     componentDidMount = ()=>{
 
-        let currentStudent = this.getCurrentStudent();
-        console.log(currentStudent)
+        /* 
+            Set Student Filters and Projection 
+            to get only Specified part of current Student
+        */
 
         const studentFilters = {
             username: getUsernameFromCookie()
         }
-
-        const studentProjection = {}
+        const studentProjection = {
+            "department": true,"semester": true, "roll_no": true
+        }
+        /* 
+            Make a Asnc Request to get the student details
+            Note :- It will return a Promise
+        */
         this.props.setStudents(studentFilters,studentProjection)
         .then(()=>{
-            console.log("AFTER FETCH :: ",this.props.students);
-        })
-        // currentStudent = this.props.
-        this.timer = setInterval( () => {
-            currentStudent = this.getCurrentStudent();
-            console.log("CURRENT STU :: ",currentStudent);
-            this.setState(prevState => {
-                return {
-                    currentStudent
-                }   
-            },()=>{
-                if(this.state.currentStudent){
-                    const relatedCourses = this.getStudentRelatedCourses(this.state.currentStudent.department, this.state.currentStudent.semester);
-                    console.log("RELATED COURSES :: ",relatedCourses);
-                    if(relatedCourses){
-                        ///////////////  SETTING STATE FOR EACH COURSE //////////////////
 
-                        relatedCourses.forEach(course => {
-                            this.setState(prevState => {
-                                return {
-                                    enrollData: {
-                                        ...prevState.enrollData, 
-                                        courseData : {
-                                            ...prevState.enrollData.courseData,
-                                            [course.name] : false
-                                        }
-                                        }
-                                }
-                            })
-                        });
+            /* 
+                Now Set Filter and Projection to Get 
+                Only Coures Related to the loogedIn Student
+            */
+            const loggedStudent = this.props.students[0];
+            const { department, semester } =loggedStudent;
 
-                        ////////////////////////// END /////////////////////////////////
-                        this.setState(prevState =>{
-                                return {
-                                    isFetching: true,
-                                    relatedCourses
+            const courseFilters = { department,semester }
+            const courseProjection = { "name": true }
+
+            /* 
+                Make the Asnc Request to get the Courses 
+            */
+            this.props.setCourses(courseFilters, courseProjection)
+            .then(()=> {
+
+                /*
+                    Set False For all Course in The State
+                    "FALSE" represents that CheckBox is unchecked
+                    and will be change to True when CheckBox is Checked
+                */
+                this.props.courses.forEach(course => {
+                    this.setState(prevState => {
+                        return {
+                            enrollData: {
+                                ...prevState.enrollData, 
+                                courseData : {
+                                    ...prevState.enrollData.courseData,
+                                    [course.name] : false
                                 }
-                            }
-                        )
-                        clearInterval(this.timer);
-                        this.timer = null;
-                    }
-                }
+                                }
+                        }
+                    })
+                });
+                this.setState({isFetching: true})
             })
-        },this.state.FetchingTime)
+        })
     }
         
     render() {
@@ -289,7 +270,7 @@ class EnrollToCoursePage extends Component{
                         <div className="Enroll_FormContainer">
                             <header>
                                 <h1>
-                                    Enroll<span>({this.state.currentStudent.roll_no})</span>
+                                    Enroll<span>({this.props.students[0].roll_no})</span>
                                 </h1>
                             </header>
                             {this.state.message && <span className="confirmationMessage">{this.state.message}</span>}
@@ -298,7 +279,7 @@ class EnrollToCoursePage extends Component{
                                 <div>
                                     <div className="inputErrorDiv">
                                     {
-                                            this.state.relatedCourses.map(course =>{
+                                            this.props.courses.map(course =>{
                                                 const { name, department, semester } = course
                                                 return <div key={ name+department+semester } className="courseCheckboxDiv">
                                                             <div>
@@ -338,7 +319,6 @@ class EnrollToCoursePage extends Component{
                                                 type="file"
                                                 id="studentImage"
                                                 placeholder=""
-                                                // value={this.state.enrollData.studentImage}
                                                 onChange={this.onFileInputChange}
                                             />
                                         </div>
