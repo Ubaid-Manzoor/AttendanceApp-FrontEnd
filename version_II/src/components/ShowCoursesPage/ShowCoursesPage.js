@@ -7,13 +7,25 @@ import './_course.scss';
 
 
 class ShowCoursesPage extends Component {
-    constructor(props){
-        super(props);
-        this.props.getCourses();
+    componentDidMount = ()=>{
+        /**
+         *  Set Projection to get only specific details
+         *  of Courses
+         */
+        const projection = {
+            "name": true,
+            "department": true,
+            "semester": true,
+            "teacherAssigned": true
+        }
+
+        /**
+         * Make Request for all Courses with 
+         * Above Projection 
+         */
+        this.props.getCourses({},projection)
     }
-    
     render(){
-        const listOfCourses = this.props.courses;
         return(
             <div className="courseBlock sidePage">
                 <div className="courseContainer">
@@ -22,7 +34,7 @@ class ShowCoursesPage extends Component {
                     </header>
                     <header></header>
                     <div className="mainBody">
-                        {listOfCourses.map((course =>{
+                        {this.props.courses.map((course =>{
                             const {name, department, teacherAssigned } = course;
                             return <CourseComponent 
                                         key={name+department} 
@@ -46,7 +58,7 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-        getCourses: ()=> dispatch(getAndSetCourses())
+        getCourses: (filters, projection)=> dispatch(getAndSetCourses(filters, projection))
     }
 }
 

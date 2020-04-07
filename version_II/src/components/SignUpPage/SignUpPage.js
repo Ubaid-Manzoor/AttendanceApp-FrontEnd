@@ -29,49 +29,14 @@ class SignUpPage extends Component{
 
     /////////////////////////INPUT HANDLERS////////////////////////////
 
-    onUsernameChange = (e)=>{
-        const username = e.target.value
+    onInputChange = (e)=>{
+        const value = e.target.value;
+        const name = e.target.id;
         this.setState((prevState)=>{
             return {
                 signup_data: {
                     ...prevState.signup_data,
-                    username
-                }
-            }
-        })
-    }
-
-    onPasswordChange = (e)=>{
-        const password = e.target.value
-        this.setState((prevState)=>{
-            return {
-                signup_data: {
-                    ...prevState.signup_data,
-                    password
-                }
-            }
-        })
-    }
-
-    onConfirmPasswordChange = (e)=>{
-        const confirm_password = e.target.value
-        this.setState((prevState)=>{
-            return {
-                signup_data: {
-                    ...prevState.signup_data,
-                    confirm_password
-                }
-            }
-        })
-    }
-
-    onRoleChange = (e)=>{
-        const role = e.target.value;
-        this.setState((prevState)=>{
-            return {
-                signup_data: {
-                    ...prevState.signup_data,
-                    role
+                    [name]:value
                 }
             }
         })
@@ -213,7 +178,7 @@ class SignUpPage extends Component{
                                             type="text"
                                             id="username"
                                             value={this.state.signup_data.username}
-                                            onChange={this.onUsernameChange}
+                                            onChange={this.onInputChange}
                                         />
                                     </div>
                                     {this.state.errors.username && <span>{this.state.errors.username}</span>}
@@ -221,12 +186,15 @@ class SignUpPage extends Component{
                                 </div>
                             </div>
                             <div>
-                                <label className="roleLabel">ROLE</label>
+                                <label className="roleLabel">
+                                    ROLE
+                                </label>
                                 <div className="selectDiv">
                                     <select 
                                         name="role"
+                                        id="role"
                                         value={this.state.signup_data.role}
-                                        onChange={this.onRoleChange}
+                                        onChange={this.onInputChange}
                                     >
                                         <option value="student">Student</option>
                                         <option value="teacher">Teacher</option>
@@ -246,7 +214,7 @@ class SignUpPage extends Component{
                                             type="password"
                                             id="password"
                                             value={this.state.signup_data.password}
-                                            onChange={this.onPasswordChange}
+                                            onChange={this.onInputChange}
                                         />
                                     </div>
                                     {this.state.errors.password && <span>{this.state.errors.password}</span>}
@@ -256,7 +224,7 @@ class SignUpPage extends Component{
                             <div>
                                 <label 
                                     className="pwdLabel"
-                                    htmlFor="confirm-password"
+                                    htmlFor="confirm_password"
                                 >
                                     CONFIRM PASSWORD
                                 </label>
@@ -264,9 +232,9 @@ class SignUpPage extends Component{
                                     <div className="inputDiv">
                                         <input 
                                             type="password"
-                                            id="confirm-password"
+                                            id="confirm_password"
                                             value={this.state.signup_data.confirm_password}
-                                            onChange={this.onConfirmPasswordChange}
+                                            onChange={this.onInputChange}
                                         />
                                     </div>
                                     {this.state.errors.confirmPassword && <span>{this.state.errors.confirmPassword}</span>}

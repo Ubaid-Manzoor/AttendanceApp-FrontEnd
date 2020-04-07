@@ -21,7 +21,6 @@ export const getAndSetStudents = (filters={},projection={}) => {
             })
             .then(response => response.json())
             .then(response => {
-                console.log("RESPONSE STUDENTS : ",response)
                 dispatch(clearStudents());
                 response.allStudents.forEach(student => {
                     dispatch(setStudent(student))
@@ -57,7 +56,6 @@ export const startUpdateStudent = (whomToUpdate,whatToUpdate) => {
         })
         .then(response => response.json())
         .then(response => {
-            console.log(response);
             const { status } = response;
             if(status){
                 dispatch(updateStudent(whomToUpdate,whatToUpdate))

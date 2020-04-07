@@ -42,8 +42,6 @@ export const updateTeacher = (whomToUpdate,whatToUpdate) => ({
 });
 
 export const startUpdateTeacher = (whomToUpdate,whatToUpdate) => {
-    
-    console.log("ToUPdata",whatToUpdate)
     return (dispatch) => {
         fetch('http://localhost:5000/update_teacher',{
             method:['POST'],
@@ -57,7 +55,6 @@ export const startUpdateTeacher = (whomToUpdate,whatToUpdate) => {
         })
         .then(response => response.json())
         .then(response => {
-            // console.log(response);
             const { status } = response;
             if(status){
                 dispatch(updateTeacher(whomToUpdate,whatToUpdate))

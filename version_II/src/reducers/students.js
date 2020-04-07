@@ -3,7 +3,6 @@ const studentReducerDefaultState = []
 const studentReducer = (state = studentReducerDefaultState, action) =>{
     switch(action.type){
         case 'ADD_STUDENT':
-            console.log("TEACHER REDUCER CALLED")
         //  CHECK IF COURSE ALREADY EXISTS ONLY THEN SAVE IT...
             if(!state.find( student => student.username === action.student.username)){
                 return [
