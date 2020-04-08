@@ -34,26 +34,64 @@ class AddCoursePage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-
-
         // FETCH ONLY TEACHER OF CORRESPONDING DEPARTMENT
         if(name === "department"){
             const teacherFilters = {
                 "department": value
             };
             const teacherProjection = {};
-            this.props.setTeachers(teacherFilters,teacherProjection);
+            this.props.setTeachers(teacherFilters,teacherProjection)
+            .then(()=>{
+                const teacher = this.props.teachers[0]
+                /**
+                 * CHECK IF TEACHER IS EMPTY
+                 */
+                if(teacher){
+                    this.setInputState("courseData","teacherAssigned",this.props.teachers[0]['name'])
+                }else{
+                    /**
+                     * IF THERE IS NOT TEACHER IN THE DEPARTMENT
+                     * WE HAVE TO GIVE AN ERROR
+                     * TO ADD TEACHER IN THE DEPARTMENT FIRST
+                     * 
+                     * AND
+                     * 
+                     * SET TEACHER TO EMPTY STRING IN courseData
+                     */
+                    this.setInputState("courseData","teacherAssigned","")
+                    this.setErrors({
+                        "otherError": "No Teacher ADDED to the Department"
+                    })
+                }
+            })   
         }
 
+        this.setInputState("courseData",name,value);
+    }
+
+    
+    setInputState = (objName,key,value)=>{
+        /**
+         * objName : IS THE NAME OF OBJ WHICH STORE FORM DATA IN THE STATE
+         * key,value : IS THE PAIR WE WANT TO SET IN TO OBJ objName IN THE STATE 
+        */
         this.setState((prevState)=>{
             return {
-                courseData: {
-                    ...prevState.courseData,
-                    [name]:value
+                [objName]: {
+                    ...prevState[objName],
+                    [key]:value
                 }
             }
         })
     }
+
+    setDefaultState = ()=>{
+        const department = this.props.departments[0]['name']
+        const teacherAssigned = this.props.teachers[0]['name']
+        this.setInputState("courseData","department",department);
+        this.setInputState("courseData","teacherAssigned",teacherAssigned);
+    }
+
 
     /////////////////////// INPUT HANDLERS ENDS //////////////////////
 
@@ -81,37 +119,24 @@ class AddCoursePage extends Component{
         this.setState({errorsExists: false});
     }
 
-    applyAuthentication(courseData){
+    applyAuthentication(){
+        const courseData = this.state.courseData; 
         if(courseData.name === ''){
             this.setErrors({name: "Fill the box"})
+        }
+        if(courseData.teacherAssigned === ''){
+            this.setErrors({
+                "otherError": "No Teacher ADDED to the Department"
+            })
         }
     }
 
     /////////////////////// ERROR HANDLERS ENDS ////////////////////////
 
-
-
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-                callback()
-            }
-        )
-    }
-
     /////////////////////// REQUEST RELATED FUNCTIONS //////////////////////
 
-    makeRequest = (courseData) =>{
-        console.log(courseData)
-        fetch('http://localhost:5000/add_course',{
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(courseData)
-                })
-                .then(response => response.json())
-                .then(response => {
-                    const { message , status } = response.result;
+    handleResponse = (response)=>{
+        const { message , status } = response.result;
 
                     if(response.status === 200){
                         switch(status){
@@ -137,41 +162,73 @@ class AddCoursePage extends Component{
                                 break
                         }
                     }
+    }
+
+    makeRequest = (reqeustUrl, dataToSend={}) =>{
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+
+        /**
+         * ADD dataToSend ONLY IF NEEDED
+         */
+        if(!dataToSend){
+            options['body'] = dataToSend
+        }
+
+        fetch(reqeustUrl,options)
+                .then(response => response.json())
+                .then(response => {
+                    this.handleResponse(response)
                 })
     }
 
     onSubmit = (e)=>{
         e.preventDefault();
-        console.log("SUBMITTING")
-        const courseData = this.state.courseData;
 
+        /**
+         * FIRST CLEAR ALL ERROR 
+         * AND
+         * APPLY AUTHENTICATION TO CHECK FOR ERRORS
+         */
         this.clearAllErrors();
-        this.applyAuthentication(courseData);
+        this.applyAuthentication();
 
-        this.waitTillStateChange(()=>{
-            if(!this.state.errorsExists){
-                if(courseData.department === ""){
-                    courseData["department"] = this.props.departments[0]['name']
-                }
-                if(courseData.teacherAssigned === ""){
-                    courseData["teacherAssigned"] = this.props.teachers[0]['name']
-                }
-                this.makeRequest(courseData) 
-            }
-        })
+        /**
+         * IF THERE IS NO ERRORS ONLY THEN 
+         * MAKE THE REQUEST OTHERWISE DO NOTHING
+         * 
+         * AND 
+         * 
+         * THERE WILL BE SHOWING ERROR ON THE FORM IF ANY EXIST
+         */
+        if(!this.state.errorsExists){
+            const courseData = this.state.courseData;
+            this.makeRequest('http://localhost:5000/add_course',courseData); 
+        }
 
     }
 
 
     /////////////////////// REQUEST RELATED FUNCTIONS ENDS //////////////////////
-
+    
 
     ////////////////////// LIFE CYCLE FUNCTIONS /////////////////////////////////
 
     componentDidMount = ()=>{
-        console.log("CALLED!!");
+        /**
+         * AFTER RENDER IS DONE FETCH ALL DEPARTMENT AND TEACHER 
+         * IN THAT DEPARTMENT
+         */
 
-        // AFTER COMPONENT MOUNT INSTANTLY GET ALL DEPARTMENT
+        /**
+         * setDepartments
+         * 
+         * WILL FETCH THE DEPARTMENT AND SET THEM IN THE STORE
+         */
         this.props.setDepartments()
         .then(()=>{
 
@@ -188,7 +245,19 @@ class AddCoursePage extends Component{
                 "department": defaultDepartment
             }
             const teacherProjection = {}
+            /**
+             * setTeachers
+             * 
+             * WILL FETCH THE TEACHER AND SET THEM IN THE STORE
+             */
             this.props.setTeachers(teacherFilters, teacherProjection)
+            .then(
+                /**
+                 *  THIS FUNCTION WILL SET DEFAULT VALUE FOR  
+                 *  DEPARTMENT AND TEACHERASSIGNED IN THE STATE 
+                 */
+                this.setDefaultState
+            )
             
         })
     }
@@ -207,6 +276,7 @@ class AddCoursePage extends Component{
                             <h1>Add Course</h1>
                         </header>
                         {this.state.message && <span className="confirmationMessage">{this.state.message}</span>}
+                        {this.state.errors.otherError && <span className="errorMessage">{this.state.errors.otherError}</span>}
                         {this.state.errors.courseExist && <span className="errorMessage">{this.state.errors.courseExist}</span>}
                         <form onSubmit={this.onSubmit}>
                             <div>

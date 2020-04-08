@@ -21,10 +21,10 @@ export const getAndSetUser = ((username)=>{
           .then(user => {
             // RENAME ID TO USERNAME 
             user['username'] = user['_id']
-            /* 
-              REMOVE PASSWORD BECAUSE WE DONT 
-              NEED PASSWORD IN FRONTEND
-              AND PASSWORD SHOULD NOT BE SAVED IN COOKIES
+            /** 
+            *  REMOVE PASSWORD BECAUSE WE DONT 
+            *  NEED PASSWORD IN FRONTEND
+            *  AND PASSWORD SHOULD NOT BE SAVED IN COOKIES
             */
             delete user['password']
             dispatch(setUser(user))
