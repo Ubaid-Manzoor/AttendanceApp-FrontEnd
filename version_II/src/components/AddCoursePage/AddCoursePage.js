@@ -165,6 +165,7 @@ class AddCoursePage extends Component{
     }
 
     makeRequest = (reqeustUrl, dataToSend={}) =>{
+        console.log(dataToSend);
         const options = {
             method: 'POST',
             headers: {
@@ -175,8 +176,8 @@ class AddCoursePage extends Component{
         /**
          * ADD dataToSend ONLY IF NEEDED
          */
-        if(!dataToSend){
-            options['body'] = dataToSend
+        if(dataToSend){
+            options['body'] = JSON.stringify(dataToSend)
         }
 
         fetch(reqeustUrl,options)
@@ -234,12 +235,7 @@ class AddCoursePage extends Component{
 
             // SET A DEFAULT DEPARTMENT IN STATE
             const defaultDepartment = this.props.departments[0].name;
-            this.setState((prevState) =>({
-                "courseData":{
-                    ...prevState.courseData,
-                    "department": defaultDepartment
-                }
-            }))
+            this.setInputState("courseData","department",defaultDepartment);
 
             const teacherFilters = {
                 "department": defaultDepartment
