@@ -4,6 +4,9 @@ import { connect } from 'react-redux';
 import { getAndSetDepartments } from '../../actions/department';
 import { getAndSetTeachers } from '../../actions/teachers';
 
+import setInputState from '../../genericFunctions/setInputState';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+
 
 import  './_addCoursePage.scss';
 
@@ -12,7 +15,7 @@ class AddCoursePage extends Component{
         super(props);
 
         this.state = {
-            courseData: {
+            data: {
                 name: "",
                 department: "",
                 semester: 1,
@@ -21,11 +24,14 @@ class AddCoursePage extends Component{
             errorsExists: false,
             errors:{
                 name: "",
-                courseExist: "",
+                exists: "",
                 otherError: ""
             },
             message: ""
         }
+
+        this.setInputState = setInputState(this); 
+        this.handleSubmit = handleSubmit(this);
     }
 
 
@@ -47,7 +53,7 @@ class AddCoursePage extends Component{
                  * CHECK IF TEACHER IS EMPTY
                  */
                 if(teacher){
-                    this.setInputState("courseData","teacherAssigned",this.props.teachers[0]['name'])
+                    this.setInputState("data","teacherAssigned",this.props.teachers[0]['name'])
                 }else{
                     /**
                      * IF THERE IS NOT TEACHER IN THE DEPARTMENT
@@ -56,9 +62,9 @@ class AddCoursePage extends Component{
                      * 
                      * AND
                      * 
-                     * SET TEACHER TO EMPTY STRING IN courseData
+                     * SET TEACHER TO EMPTY STRING IN data
                      */
-                    this.setInputState("courseData","teacherAssigned","")
+                    this.setInputState("data","teacherAssigned","")
                     this.setErrors({
                         "otherError": "No Teacher ADDED to the Department"
                     })
@@ -66,30 +72,15 @@ class AddCoursePage extends Component{
             })   
         }
 
-        this.setInputState("courseData",name,value);
+        this.setInputState("data",name,value);
     }
 
-    
-    setInputState = (objName,key,value)=>{
-        /**
-         * objName : IS THE NAME OF OBJ WHICH STORE FORM DATA IN THE STATE
-         * key,value : IS THE PAIR WE WANT TO SET IN TO OBJ objName IN THE STATE 
-        */
-        this.setState((prevState)=>{
-            return {
-                [objName]: {
-                    ...prevState[objName],
-                    [key]:value
-                }
-            }
-        })
-    }
 
     setDefaultState = ()=>{
         const department = this.props.departments[0]['name']
         const teacherAssigned = this.props.teachers[0]['name']
-        this.setInputState("courseData","department",department);
-        this.setInputState("courseData","teacherAssigned",teacherAssigned);
+        this.setInputState("data","department",department);
+        this.setInputState("data","teacherAssigned",teacherAssigned);
     }
 
 
@@ -114,21 +105,24 @@ class AddCoursePage extends Component{
         this.setErrors({
             name: "",
             otherError: "",
-            courseExist: ""
+            exists: ""
         })
         this.setState({errorsExists: false});
     }
 
     applyAuthentication(){
-        const courseData = this.state.courseData; 
-        if(courseData.name === ''){
-            this.setErrors({name: "Fill the box"})
-        }
-        if(courseData.teacherAssigned === ''){
-            this.setErrors({
-                "otherError": "No Teacher ADDED to the Department"
-            })
-        }
+        const data = this.state.data; 
+        return new Promise((resolve, reject)=>{
+            if(data.name === ''){
+                this.setErrors({name: "Fill the box"})
+            }
+            if(data.teacherAssigned === ''){
+                this.setErrors({
+                    "otherError": "No Teacher ADDED to the Department"
+                })
+            }
+            resolve();
+        })
     }
 
     /////////////////////// ERROR HANDLERS ENDS ////////////////////////
@@ -138,78 +132,39 @@ class AddCoursePage extends Component{
     handleResponse = (response)=>{
         const { message , status } = response.result;
 
-                    if(response.status === 200){
-                        switch(status){
-                            case 201:
-                                console.log(message)
-                                this.setState({
-                                    message
-                                })
-                                break;
-                            case 409:
-                                this.setErrors({
-                                    courseExist:message
-                                })
-                                console.log(message)
-                                break;
-                            case 400:
-                                this.setErrors({
-                                    otherError: message
-                                })
-                                console.log(message)
-                                break;
-                            default:
-                                break
-                        }
-                    }
-    }
-
-    makeRequest = (reqeustUrl, dataToSend={}) =>{
-        console.log(dataToSend);
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+        if(response.status === 200){
+            switch(status){
+                case 201:
+                    console.log(message)
+                    this.setState({
+                        message
+                    })
+                    break;
+                case 409:
+                    this.setErrors({
+                        exists:message
+                    })
+                    console.log(message)
+                    break;
+                case 400:
+                    this.setErrors({
+                        otherError: message
+                    })
+                    console.log(message)
+                    break;
+                default:
+                    break
             }
         }
-
-        /**
-         * ADD dataToSend ONLY IF NEEDED
-         */
-        if(dataToSend){
-            options['body'] = JSON.stringify(dataToSend)
-        }
-
-        fetch(reqeustUrl,options)
-                .then(response => response.json())
-                .then(response => {
-                    this.handleResponse(response)
-                })
     }
+
+    
 
     onSubmit = (e)=>{
         e.preventDefault();
 
-        /**
-         * FIRST CLEAR ALL ERROR 
-         * AND
-         * APPLY AUTHENTICATION TO CHECK FOR ERRORS
-         */
-        this.clearAllErrors();
-        this.applyAuthentication();
-
-        /**
-         * IF THERE IS NO ERRORS ONLY THEN 
-         * MAKE THE REQUEST OTHERWISE DO NOTHING
-         * 
-         * AND 
-         * 
-         * THERE WILL BE SHOWING ERROR ON THE FORM IF ANY EXIST
-         */
-        if(!this.state.errorsExists){
-            const courseData = this.state.courseData;
-            this.makeRequest('http://localhost:5000/add_course',courseData); 
-        }
+        const url = 'http://localhost:5000/add_course';
+        this.handleSubmit(url);
 
     }
 
@@ -235,7 +190,7 @@ class AddCoursePage extends Component{
 
             // SET A DEFAULT DEPARTMENT IN STATE
             const defaultDepartment = this.props.departments[0].name;
-            this.setInputState("courseData","department",defaultDepartment);
+            this.setInputState("data","department",defaultDepartment);
 
             const teacherFilters = {
                 "department": defaultDepartment
@@ -273,7 +228,7 @@ class AddCoursePage extends Component{
                         </header>
                         {this.state.message && <span className="confirmationMessage">{this.state.message}</span>}
                         {this.state.errors.otherError && <span className="errorMessage">{this.state.errors.otherError}</span>}
-                        {this.state.errors.courseExist && <span className="errorMessage">{this.state.errors.courseExist}</span>}
+                        {this.state.errors.exists && <span className="errorMessage">{this.state.errors.exists}</span>}
                         <form onSubmit={this.onSubmit}>
                             <div>
                                 <label 
@@ -288,7 +243,7 @@ class AddCoursePage extends Component{
                                             type="text"
                                             id="name"
                                             placeholder=""
-                                            value={this.state.courseData.name}
+                                            value={this.state.data.name}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -301,7 +256,7 @@ class AddCoursePage extends Component{
                                     <select 
                                         id="department"
                                         name="department"
-                                        value={this.state.courseData.department}
+                                        value={this.state.data.department}
                                         onChange={this.onInputChange}
                                     >
                                         {
@@ -320,7 +275,7 @@ class AddCoursePage extends Component{
                                     <select 
                                         id="teacherAssigned"
                                         name="teacher"
-                                        value={this.state.courseData.teacher}
+                                        value={this.state.data.teacher}
                                         onChange={this.onInputChange}
                                     >
                                         {
@@ -339,7 +294,7 @@ class AddCoursePage extends Component{
                                     <select 
                                         id="semester"
                                         name="semester"
-                                        // value={this.state.courseData.semester}
+                                        // value={this.state.data.semester}
                                         onChange={this.onInputChange}
                                     >
                                         <option  value="1">1</option>

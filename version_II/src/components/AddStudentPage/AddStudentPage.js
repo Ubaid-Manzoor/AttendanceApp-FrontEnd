@@ -6,19 +6,24 @@ import './_addStudentPage.scss';
 import StudentComponent from './StudentComponent';
 import { getAndSetDepartments } from '../../actions/department';
 
+import setInputState from '../../genericFunctions/setInputState';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+
 class AddStudentPage extends Component{
     constructor(props){
         super(props);
 
         this.state = {
-            studentData: {
+            data: {
                 username: "",
                 name: "",
                 roll_no: "",
                 department: "",
                 semester: 1,
                 password: "",
-                confirmPassword: ""
+                confirmPassword: "",
+                "role": "student",
+                "confirmed": true
             },
             errorsExists: false,
             errors:{
@@ -27,11 +32,14 @@ class AddStudentPage extends Component{
                 roll_no: "",
                 password: "",
                 confirmPassword: "",
-                studentExist: "",
+                exists: "",
                 otherError: ""
             },
             message: ""
         }
+
+        this.setInputState = setInputState(this);
+        this.handleSubmit = handleSubmit(this);
     }
 
     /////////////////////// INPUT HANDLER /////////////////////////////////
@@ -39,15 +47,7 @@ class AddStudentPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-        console.log(value,name)
-        this.setState((prevState)=>{
-            return {
-                studentData: {
-                    ...prevState.studentData,
-                    [name]:value
-                }
-            }
-        })
+        this.setInputState("data",name,value)
     }
     /////////////////////// INPUT HANDLER ENDS /////////////////////////////////
 
@@ -74,30 +74,35 @@ class AddStudentPage extends Component{
             password: "",
             otherError: "",
             confirmPassword: "",
-            studentExists: ""
+            exists: ""
         })
         this.setState({errorsExists: false});
     }
 
 
-    applyAuthentication(studentData){
-        if(studentData.username === ''){
-            this.setErrors({username: "Fill the box"})
-        }
-        if(studentData.name === ''){
-            this.setErrors({name: "Fill the box"})
-        }
-        if(studentData.roll_no === ''){
-            this.setErrors({name: "Fill the box"})
-        }
-        if(studentData.password === ''){
-            this.setErrors({password: "Fill the box"})
-        }
-        if(studentData.confirmPassword === ''){
-            this.setErrors({confirmPassword: "Fill the box"})
-        }else if(studentData['password'] !== studentData['confirmPassword']){
-            this.setErrors({confirmPassword: "password did not match"})
-        }
+    applyAuthentication(){
+        const data = this.state.data;
+
+        return new Promise((resolve,reject)=>{
+            if(data.username === ''){
+                this.setErrors({username: "Fill the box"})
+            }
+            if(data.name === ''){
+                this.setErrors({name: "Fill the box"})
+            }
+            if(data.roll_no === ''){
+                this.setErrors({name: "Fill the box"})
+            }
+            if(data.password === ''){
+                this.setErrors({password: "Fill the box"})
+            }
+            if(data.confirmPassword === ''){
+                this.setErrors({confirmPassword: "Fill the box"})
+            }else if(data['password'] !== data['confirmPassword']){
+                this.setErrors({confirmPassword: "password did not match"})
+            }
+            resolve()
+        })
     }
 
 
@@ -106,87 +111,53 @@ class AddStudentPage extends Component{
 
 
     //////////////////////  REQUEST RELATED FUNCTONS ///////////////////////////
-    
 
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-                callback()
+    handleResponse = (response)=>{
+        const { message , status } = response.result;
+
+        if(response.status === 200){
+            switch(status){
+                case 201:
+                    console.log(message)
+                    this.setState({
+                        message
+                    })
+                    this.props.setStudents();
+                    break;
+                case 409:
+                    this.setErrors({
+                        exists:message
+                    })
+                    console.log(message)
+                    break;
+                case 400:
+                    this.setErrors({
+                        otherError: message
+                    })
+                    console.log(message)
+                    break;
+                default:
+                    break
             }
-        )
+        }
     }
-
-    makeRequest = (studentData) =>{
-        console.log(studentData)
-        fetch('http://localhost:5000/signup',{
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(studentData)
-                })
-                .then(response => response.json())
-                .then(response => {
-                    const { message , status } = response.result;
-
-                    if(response.status === 200){
-                        switch(status){
-                            case 201:
-                                console.log(message)
-                                this.setState({
-                                    message
-                                })
-                                this.props.setStudents();
-                                break;
-                            case 409:
-                                this.setErrors({
-                                    studentExists:message
-                                })
-                                console.log(message)
-                                break;
-                            case 400:
-                                this.setErrors({
-                                    otherError: message
-                                })
-                                console.log(message)
-                                break;
-                            default:
-                                break
-                        }
-                    }
-                })
-    }
-
 
     onSubmit = (e)=>{
         e.preventDefault();
 
-        const studentData = {
-            ...this.state.studentData,
-            "role": "student",
-            "confirmed": true
-        };
-
-        
-        this.clearAllErrors();
-        this.applyAuthentication(studentData);
-        
-        this.waitTillStateChange(()=>{
-            if(!this.state.errorsExists){
-                if(studentData.department === ""){
-                    studentData["department"] = this.props.departments[0]['name']
-                }
-                
-                delete studentData['confirmPassword']
-                this.makeRequest(studentData) 
-            }
-        })
-
+        const url = 'http://localhost:5000/signup';
+        this.handleSubmit(url);
     }
 
     //////////////////////  REQUEST RELATED FUNCITONS ENDS ///////////////////////////
 
 
     ///////////////////// LIFE CYCLE FUNCTION ////////////////////////////////////////
+    setDefaultState = ()=>{
+        const department = this.props.departments[0]['name']
+        this.setInputState("data","department",department);
+    }
+
 
     componentDidMount = ()=>{
         /***********************************************************/
@@ -195,7 +166,8 @@ class AddStudentPage extends Component{
             IN FUTURE I WILL FETCH FOR  A PARTICULAR COURSE AND DEPARTMENT
         */
         this.props.setStudents();
-        this.props.setDepartments();
+        this.props.setDepartments()
+        .then(()=>this.setDefaultState)
     }
 
     ///////////////////// LIFE CYCLE FUNCTION ENDS ////////////////////////////////////////
@@ -213,7 +185,7 @@ class AddStudentPage extends Component{
                             <h1>Add Student</h1>
                         </header>
                         {this.state.message && <span className="confirmationMessage">{this.state.message}</span>}
-                        {this.state.errors.studentExists && <span className="errorMessage">{this.state.errors.studentExists}</span>}
+                        {this.state.errors.exists && <span className="errorMessage">{this.state.errors.exists}</span>}
                         <form onSubmit={this.onSubmit}>
                             <div>
                                 <label 
@@ -228,7 +200,7 @@ class AddStudentPage extends Component{
                                             type="text"
                                             id="username"
                                             placeholder=""
-                                            value={this.state.studentData.username}
+                                            value={this.state.data.username}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -248,7 +220,7 @@ class AddStudentPage extends Component{
                                             type="text"
                                             id="name"
                                             placeholder=""
-                                            value={this.state.studentData.name}
+                                            value={this.state.data.name}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -268,7 +240,7 @@ class AddStudentPage extends Component{
                                             type="text"
                                             id="roll_no"
                                             placeholder=""
-                                            value={this.state.studentData.roll_no}
+                                            value={this.state.data.roll_no}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -281,7 +253,7 @@ class AddStudentPage extends Component{
                                     <select 
                                         id="department"
                                         name="department"
-                                        value={this.state.studentData.department}
+                                        value={this.state.data.department}
                                         onChange={this.onInputChange}
                                     >
                                         {
@@ -300,7 +272,7 @@ class AddStudentPage extends Component{
                                     <select 
                                         id="semester"
                                         name="semester"
-                                        value={this.state.studentData.semester}
+                                        value={this.state.data.semester}
                                         onChange={this.onInputChange}
                                     >
                                         <option  value="1">1</option>
@@ -327,7 +299,7 @@ class AddStudentPage extends Component{
                                             type="password"
                                             id="password"
                                             placeholder=""
-                                            value={this.state.studentData.password}
+                                            value={this.state.data.password}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -347,7 +319,7 @@ class AddStudentPage extends Component{
                                             type="password"
                                             id="confirmPassword"
                                             placeholder=""
-                                            value={this.state.studentData.confirmPassword}
+                                            value={this.state.data.confirmPassword}
                                             onChange={this.onInputChange}
                                         />
                                     </div>

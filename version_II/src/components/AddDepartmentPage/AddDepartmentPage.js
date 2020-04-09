@@ -4,6 +4,11 @@ import { getAndSetDepartments } from '../../actions/department';
 
 import DepartmentComponent from './DepartmentComponent';
 
+// import makeRequest  from '../../genericFunctions/makeRequest';
+import setInputState from '../../genericFunctions/setInputState';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+
+
 import  './_addDepartmentPage.scss';
 
 class AddDepartmentPage extends Component{
@@ -11,17 +16,19 @@ class AddDepartmentPage extends Component{
         super(props);
 
         this.state = {
-            departmentData: {
-                departmentName: ""
+            data: {
+                name: ""
             },
             errorsExists: false,
             errors:{
-                departmentName: "",
-                departmentExists: "",
+                name: "",
+                exists: "",
                 otherError: ""
             },
             message: ""
         }
+        this.setInputState = setInputState(this);
+        this.handleSubmit = handleSubmit(this);
     }
 
     //////////////////////////  INPUT HANDLERS //////////////////////////
@@ -29,14 +36,7 @@ class AddDepartmentPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-        this.setState((prevState)=>{
-            return {
-                departmentData: {
-                    ...prevState.departmentData,
-                    [name]:value
-                }
-            }
-        })
+        this.setInputState("data",name,value)
     }
 
     //////////////////////////  INPUT HANDLERS ENDS //////////////////////////
@@ -58,18 +58,22 @@ class AddDepartmentPage extends Component{
 
     clearAllErrors = ()=>{
         this.setErrors({
-            departmentName: "",
-            departmentExists: "",
+            name: "",
+            exists: "",
             otherError: "",
         })
         this.setState({errorsExists: false});
     }
 
 
-    applyAuthentication(departmentData){
-        if(departmentData.departmentName === ''){
-            this.setErrors({departmentName: "Fill the box"})
-        }
+    applyAuthentication(){
+        const data = this.state.data;
+        return new Promise((resolve, reject)=>{
+            if(data.name === ''){
+                this.setErrors({name: "Fill the box"})
+            }
+            resolve();
+        })
     }
 
     ////////////////////////// ERROR HANDLER ENDS /////////////////////////////////
@@ -77,67 +81,39 @@ class AddDepartmentPage extends Component{
 
     /////////////////////////  REQUEST RELATED FUNCTIONS /////////////////////////
 
+    handleResponse = (response)=>{
+        const { message , status } = response.result;
 
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-                callback()
-            }
-        )
+        switch(status){
+            case 201:
+                console.log(message)
+                this.setState({
+                    message
+                })
+                this.setState({message})
+                break;
+            case 409:
+                this.setErrors({
+                    exists:message
+                })
+                console.log(message)
+                break;
+            case 400:
+                this.setErrors({
+                    otherError: message
+                })
+                console.log(message)
+                break;
+            default:
+                break
+        }
     }
-
 
     onSubmit = (e)=>{
         e.preventDefault();
 
-        const departmentData = this.state.departmentData;
-        console.log(departmentData);
-
-        this.clearAllErrors();
-        this.applyAuthentication(departmentData);
-
-        this.waitTillStateChange(()=>{
-            console.log(this.state)
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/add_department',{
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(departmentData)
-                })
-                .then(response => response.json())
-                .then(response => {
-                    const { message , status } = response.result;
-
-                    if(response.status === 200){
-                        switch(status){
-                            case 201:
-                                console.log(message)
-                                this.setState({
-                                    message
-                                })
-                                this.setState({message})
-                                break;
-                            case 409:
-                                this.setErrors({
-                                    departmentExists:message
-                                })
-                                console.log(message)
-                                break;
-                            case 400:
-                                this.setErrors({
-                                    otherError: message
-                                })
-                                console.log(message)
-                                break;
-                            default:
-                                break
-                        }
-                    }
-                })
-            }
-        })
-
+        const url = 'http://localhost:5000/add_department';
+        this.handleSubmit(url);
     }
 
 
@@ -160,12 +136,12 @@ class AddDepartmentPage extends Component{
                             <h1>Add Department</h1>
                         </header>
                         {this.state.message && <span className="confirmationMessage">{this.state.message}</span>}
-                        {this.state.errors.departmentExists && <span className="errorMessage">{this.state.errors.departmentExists}</span>}
+                        {this.state.errors.exists && <span className="errorMessage">{this.state.errors.exists}</span>}
                         <form onSubmit={this.onSubmit}>
                             <div>
                                 <label 
                                     className="Label"
-                                    htmlFor="departmentName"
+                                    htmlFor="name"
                                 >
                                     Name Of Department
                                 </label>
@@ -173,13 +149,13 @@ class AddDepartmentPage extends Component{
                                     <div className="inputDiv">
                                         <input
                                             type="text"
-                                            id="departmentName"
+                                            id="name"
                                             placeholder=""
-                                            value={this.state.departmentData.departmentName}
+                                            value={this.state.data.name}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
-                                    {this.state.errors.departmentName && <span className="errorMessage">{this.state.errors.departmentName}</span>}
+                                    {this.state.errors.name && <span className="errorMessage">{this.state.errors.name}</span>}
                                 </div>
                             </div>
                             <button className="Button">
