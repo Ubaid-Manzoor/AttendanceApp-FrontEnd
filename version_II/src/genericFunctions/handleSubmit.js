@@ -20,20 +20,27 @@ export default function(requestUrl){
      */
     .then(()=>{
         if(!this.state.errorsExists){
-            console.log(this)
-            console.log(this.state);
             const data = this.state.data;
-            console.log(data)
-            // const requestUrl = 'http://localhost:5000/add_course'; 
 
             /**
              * TRY DELETING ANY THING THAT CAN COME IN DATA
              * BUT SHOULD NOT BE SEND TO SERVER LIKE:- CONFIRM PASSWORD
              */
 
-            delete data['confirmPassword']
-            
-            makeRequest(requestUrl,data)
+            const notAllowed = ['confirmPassword']
+
+            /**
+             * ONLY ALLOW THE DATA WHICH IS NOT IN 
+             * NOT ALLOWED ARRAY
+             */
+            const filterData = Object.keys(data)
+                               .filter(key => notAllowed.includes(key) ? false : true)
+                               .reduce((obj, key)=>{
+                                    obj[key] = data[key]
+                                    return obj;
+                               },{});
+
+            makeRequest(requestUrl,filterData)
             .then(response => response.json())
             .then(response => this.handleResponse(response))
         }

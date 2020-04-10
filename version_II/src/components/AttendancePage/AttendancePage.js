@@ -6,6 +6,9 @@ import getAndSetCourses from '../../actions/courses';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 import StudentComponent from './StudentComponent';
 
+import setInputState from '../../genericFunctions/setInputState';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+
 import './_attendancePage.scss';
 
 
@@ -15,8 +18,8 @@ class AttendancePage extends Component{
         this.state = {
             isFetching: false,
             FetchingTime : 100 ,
-            Data: {
-                classImage: undefined,
+            data: {
+                image: undefined,
                 courseData: {}
             },
             errorsExists: false,
@@ -34,9 +37,9 @@ class AttendancePage extends Component{
         const value = e.target.files[0];
         this.setState((prevState)=>{
             return {
-                Data: {
-                    ...prevState.Data,
-                    classImage:value
+                data: {
+                    ...prevState.data,
+                    image:value
                 }
             }
         })
@@ -68,8 +71,8 @@ class AttendancePage extends Component{
     
             this.setState((prevState)=>{
                 return {
-                    Data: {
-                        ...prevState.Data, 
+                    data: {
+                        ...prevState.data, 
                         courseData: {
                             name,
                             department,
@@ -109,12 +112,17 @@ class AttendancePage extends Component{
     }
 
     
-    applyAuthentication(Data){
-        const { classImage } = Data
+    applyAuthentication(){
+        const { image } = this.state.data;
 
-        if(classImage === undefined){
-            this.setErrors({fileError: "Upload a File"})
-        }
+        return new Promise((resovle,reject)=>{
+            if(image === undefined){
+                this.setErrors({fileError: "Upload a File"})
+            }
+
+            resovle();
+        })
+
     }
 
 
@@ -131,9 +139,13 @@ class AttendancePage extends Component{
     }
 
     setTodaysAttendance = () => {
-        const currentCourseName = this.state.Data.courseData.name;
-        // SET CURRENT COURSE TO STORE FROM BACKEND
-        // TO GET THE ATTENDANCD
+        const currentCourseName = this.state.data.courseData.name;
+        /**
+         *  We already have fetched the all related courses for the teacher
+         * but still are making the request again because in the initial request
+         * we dont get the attendance of course(bcoz it would have wasted the band-width)
+         * now we only are fetch attendance of this course(which is selected) not for all of them
+         */
         this.props.setCourses({
             "name": currentCourseName
         })
@@ -160,15 +172,52 @@ class AttendancePage extends Component{
 
     }
 
+    handleResponse = (response)=>{
+        const { message , status } = response.result;
+        if(response.status === 200){
+            switch(status){
+                case 201:
+                    console.log(message)
+                    this.setState(prevState => ({
+                        messages: message
+                    }))
+
+                    // DISPLAY ATTENDANCE AFTER IT IS DONE
+                    this.setTodaysAttendance()
+                    break;
+                case 400:
+                    console.log(message)
+                    this.setState(prevState => ({
+                        messages: message
+                    }))
+                    break
+                case 401:
+                    console.log(message)
+                    this.setState(prevState => {
+                        return {
+                            ...prevState,
+                            errors : {
+                                ...prevState.errors,
+                                otherError: message
+                            }
+                        }
+                    })
+                    break
+                    default:
+                        break
+                    }
+        }
+    }
+
 
     makeRequest = () =>{
         let formData = new FormData();
-        const { classImage, courseData }  = this.state.Data;
+        const { image, courseData }  = this.state.data;
 
-        formData.append('file', classImage)
+        formData.append('file', image)
         formData.append("courseData",JSON.stringify(courseData));
         
-        this.applyAuthentication(this.state.Data);
+        this.applyAuthentication();
 
         // SETSTATE IS ASNC FUNCTION SO WE NEED TO WAIT UNTILL 
         //ALL SETSTATE ARE DONE CHANGING STATE
@@ -269,8 +318,8 @@ class AttendancePage extends Component{
                         return {
                             isFetching: true,
                             relatedCourses,
-                            Data: {
-                                ...prevState.Data,
+                            data: {
+                                ...prevState.data,
                                 courseData : {
                                     "name" : relatedCourses[0]['name'],
                                     "department" : relatedCourses[0]['department'],
@@ -350,7 +399,7 @@ class AttendancePage extends Component{
                                     <div className="inputDiv">
                                         <input
                                             type="file"
-                                            id="classImage"
+                                            id="image"
                                             placeholder=""
                                             onChange={this.onFileInputChange}
                                         />
