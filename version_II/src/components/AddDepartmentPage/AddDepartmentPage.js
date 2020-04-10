@@ -27,8 +27,6 @@ class AddDepartmentPage extends Component{
             },
             message: ""
         }
-        this.setInputState = setInputState(this);
-        this.handleSubmit = handleSubmit(this);
     }
 
     //////////////////////////  INPUT HANDLERS //////////////////////////
@@ -36,7 +34,7 @@ class AddDepartmentPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-        this.setInputState("data",name,value)
+        setInputState.call(this,"data",name,value)
     }
 
     //////////////////////////  INPUT HANDLERS ENDS //////////////////////////
@@ -91,6 +89,7 @@ class AddDepartmentPage extends Component{
                     message
                 })
                 this.setState({message})
+                this.props.setDepartments();
                 break;
             case 409:
                 this.setErrors({
@@ -113,7 +112,7 @@ class AddDepartmentPage extends Component{
         e.preventDefault();
 
         const url = 'http://localhost:5000/add_department';
-        this.handleSubmit(url);
+        handleSubmit.call(this,url);
     }
 
 

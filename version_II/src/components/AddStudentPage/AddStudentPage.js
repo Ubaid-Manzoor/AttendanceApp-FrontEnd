@@ -37,9 +37,6 @@ class AddStudentPage extends Component{
             },
             message: ""
         }
-
-        this.setInputState = setInputState(this);
-        this.handleSubmit = handleSubmit(this);
     }
 
     /////////////////////// INPUT HANDLER /////////////////////////////////
@@ -47,7 +44,7 @@ class AddStudentPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-        this.setInputState("data",name,value)
+        setInputState.call(this,"data",name,value)
     }
     /////////////////////// INPUT HANDLER ENDS /////////////////////////////////
 
@@ -146,7 +143,7 @@ class AddStudentPage extends Component{
         e.preventDefault();
 
         const url = 'http://localhost:5000/signup';
-        this.handleSubmit(url);
+        handleSubmit.call(this,url);
     }
 
     //////////////////////  REQUEST RELATED FUNCITONS ENDS ///////////////////////////
@@ -155,7 +152,7 @@ class AddStudentPage extends Component{
     ///////////////////// LIFE CYCLE FUNCTION ////////////////////////////////////////
     setDefaultState = ()=>{
         const department = this.props.departments[0]['name']
-        this.setInputState("data","department",department);
+        setInputState.call(this,"data","department",department);
     }
 
 

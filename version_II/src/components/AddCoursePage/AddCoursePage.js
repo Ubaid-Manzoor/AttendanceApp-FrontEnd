@@ -29,9 +29,6 @@ class AddCoursePage extends Component{
             },
             message: ""
         }
-
-        this.setInputState = setInputState(this); 
-        this.handleSubmit = handleSubmit(this);
     }
 
 
@@ -53,7 +50,7 @@ class AddCoursePage extends Component{
                  * CHECK IF TEACHER IS EMPTY
                  */
                 if(teacher){
-                    this.setInputState("data","teacherAssigned",this.props.teachers[0]['name'])
+                    setInputState.call(this,"data","teacherAssigned",this.props.teachers[0]['name'])
                 }else{
                     /**
                      * IF THERE IS NOT TEACHER IN THE DEPARTMENT
@@ -64,7 +61,7 @@ class AddCoursePage extends Component{
                      * 
                      * SET TEACHER TO EMPTY STRING IN data
                      */
-                    this.setInputState("data","teacherAssigned","")
+                    setInputState.call(this,"data","teacherAssigned","")
                     this.setErrors({
                         "otherError": "No Teacher ADDED to the Department"
                     })
@@ -72,15 +69,15 @@ class AddCoursePage extends Component{
             })   
         }
 
-        this.setInputState("data",name,value);
+        setInputState.call(this,"data",name,value);
     }
 
 
     setDefaultState = ()=>{
         const department = this.props.departments[0]['name']
         const teacherAssigned = this.props.teachers[0]['name']
-        this.setInputState("data","department",department);
-        this.setInputState("data","teacherAssigned",teacherAssigned);
+        setInputState.call(this,"data","department",department);
+        setInputState.call(this,"data","teacherAssigned",teacherAssigned);
     }
 
 
@@ -164,7 +161,7 @@ class AddCoursePage extends Component{
         e.preventDefault();
 
         const url = 'http://localhost:5000/add_course';
-        this.handleSubmit(url);
+        handleSubmit.call(this,url);
 
     }
 
@@ -190,7 +187,7 @@ class AddCoursePage extends Component{
 
             // SET A DEFAULT DEPARTMENT IN STATE
             const defaultDepartment = this.props.departments[0].name;
-            this.setInputState("data","department",defaultDepartment);
+            setInputState.call(this,"data","department",defaultDepartment);
 
             const teacherFilters = {
                 "department": defaultDepartment
