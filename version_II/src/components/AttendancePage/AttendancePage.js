@@ -7,10 +7,16 @@ import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 import StudentComponent from './StudentComponent';
 
 import setInputState from '../../genericFunctions/setInputState';
-import handleSubmit from '../../genericFunctions/handleSubmit';
 
 import './_attendancePage.scss';
 
+
+/**
+ * NOTE :- 
+ *  FOR THIS PAGE WE CANT USE ANY GENERIC FUNCTION 
+ *  BCOZ HANDLING OF FILES IS DIFFERENT THAT SIMPLE DATA
+ *  AND THEREFORE NEED DIFFERENT handleSubmit and makeReqeust
+ */
 
 class AttendancePage extends Component{
     constructor(props){
@@ -35,15 +41,7 @@ class AttendancePage extends Component{
     
     onFileInputChange = (e) => {
         const value = e.target.files[0];
-        this.setState((prevState)=>{
-            return {
-                data: {
-                    ...prevState.data,
-                    image:value
-                }
-            }
-        })
-        
+        setInputState.call(this,"data","image",value)
     }
 
     getAndSetTeacherRelatedCourses = ()=>{
@@ -57,30 +55,27 @@ class AttendancePage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
 
-        // AT THIS POINT IT IS POSSIBLE COURSES IN THE STATE
-        // IS JUST ONE COURSES WHICH WAS SELECTED WHILE MAKING ATTENDANCE
-        // BCOZ OF LINE 135
-        
-        // => ON SWITCHING TO DIFFERENT COURSE 
-        // WE FIRST NEED TO GET ALL THE COURSE AGAIN 
+        /* AT THIS POINT IT IS POSSIBLE COURSES IN THE STATE
+        * IS JUST ONE COURSES WHICH WAS SELECTED WHILE MAKING ATTENDANCE
+        * BCOZ WHEN WE MAKE ATTENDANCE WE JUST GET ATTENDANCE INFO OF A
+        * SINGLE COURSE SO NOW WE ONLY HAVE DATA OF ONE COURSE IN STORE 
+        * 
+        * AND
+        * 
+        * => ON SWITCHING TO DIFFERENT COURSE 
+        * WE FIRST NEED TO GET ALL THE COURSE AGAIN 
+        */
+       
         this.getAndSetTeacherRelatedCourses()
         .then(()=>{
             const currentSelectedCourse = this.props.courses.filter(course => course.name === value)[0]
             const { department } = this.props.teachers[0];
             const { name, semester } = currentSelectedCourse;
     
-            this.setState((prevState)=>{
-                return {
-                    data: {
-                        ...prevState.data, 
-                        courseData: {
-                            name,
-                            department,
-                            semester
-                        }
-                     }
-                }
-            },()=> this.setTodaysAttendance()/* GET ATTENDANCE OF COURSE SELECTED IN DROP DOWN */)
+            setInputState.call(this,"data","courseData",{
+                name,department,semester
+            })
+            .then(this.setTodaysAttendance)/* GET ATTENDANCE OF COURSE SELECTED IN DROP DOWN */
         })
         // console.log("run")
     }
@@ -131,12 +126,6 @@ class AttendancePage extends Component{
 
     //////////////////////////////////// REQUEST RELATED FUNCTIONS ///////////////////////////////////////
 
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-            callback()
-            }
-        )
-    }
 
     setTodaysAttendance = () => {
         const currentCourseName = this.state.data.courseData.name;
@@ -149,6 +138,7 @@ class AttendancePage extends Component{
         this.props.setCourses({
             "name": currentCourseName
         })
+
         .then(()=>{
             const AttendanceArray = this.props.courses[0]['attendance']
             
@@ -210,72 +200,49 @@ class AttendancePage extends Component{
     }
 
 
-    makeRequest = () =>{
+    makeRequest = (requestUrl) =>{
         let formData = new FormData();
         const { image, courseData }  = this.state.data;
 
         formData.append('file', image)
         formData.append("courseData",JSON.stringify(courseData));
-        
-        this.applyAuthentication();
 
-        // SETSTATE IS ASNC FUNCTION SO WE NEED TO WAIT UNTILL 
-        //ALL SETSTATE ARE DONE CHANGING STATE
-        this.waitTillStateChange(()=>{    
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/initiate_attendence',{
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(response => {
-                        const { message , status } = response.result;
-                        if(response.status === 200){
-                            switch(status){
-                                case 201:
-                                    console.log(message)
-                                    this.setState(prevState => ({
-                                        messages: message
-                                    }))
+        const options = {
+            method: 'POST',
+            body: formData
+        }
 
-                                    // DISPLAY ATTENDANCE AFTER IT IS DONE
-                                    this.setTodaysAttendance()
-                                    break;
-                                case 400:
-                                    console.log(message)
-                                    this.setState(prevState => ({
-                                        messages: message
-                                    }))
-                                    break
-                                case 401:
-                                    console.log(message)
-                                    this.setState(prevState => {
-                                        return {
-                                            ...prevState,
-                                            errors : {
-                                                ...prevState.errors,
-                                                otherError: message
-                                            }
-                                        }
-                                    })
-                                    break
-                                    default:
-                                        break
-                                    }
-                        }
-                })
-            }
-        })
+        if(!this.state.errorsExists){
+            fetch(requestUrl,options)
+            .then(response => response.json())
+            .then(response => this.handleResponse(response))
+        }
     }
     
     
     
     onSubmit = (e)=>{
         e.preventDefault();
-        // CLEAR ALL EXISTING ERROR TO START NEW
+
+        /**
+         * FIRST CLEAR ALL ERROR 
+         * AND
+         * APPLY AUTHENTICATION TO CHECK FOR ERRORS
+        */
         this.clearAllErrors();
-        // MAKE REQUEST TO MAKE ATTENDANCE
-        this.makeRequest() 
+        this.applyAuthentication()
+        /**
+         * IF THERE IS NO ERRORS ONLY THEN 
+         * MAKE THE REQUEST OTHERWISE DO NOTHING
+         * 
+         * AND 
+         * 
+         * THERE WILL BE SHOWING ERROR ON THE FORM IF ANY EXIST
+        */
+        .then(()=>{
+            const url = "http://localhost:5000/initiate_attendence";
+            this.makeRequest(url) 
+        })
     }
 
 

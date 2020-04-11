@@ -6,7 +6,7 @@ export default function(reqeustUrl, dataToSend={}){
         },
         /**
          * EVEN IF dataToSend IS EMPTY IT WILL 
-         * SIMPLY SENF AND EMPTY OBJECT & IT WILL WORK
+         * SIMPLY SEND AND EMPTY OBJECT & IT WILL WORK
          */
         body: JSON.stringify(dataToSend)
 

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { getAndSetStudents } from '../../actions/students';
 import getAndSetCourses from '../../actions/courses';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
+import setInputState from '../../genericFunctions/setInputState';
 
 import './_enrollToCoursePage.scss';
 
@@ -14,7 +15,7 @@ class EnrollToCoursePage extends Component{
         this.state = {
             isFetching: false,
             FetchingTime : 100 ,
-            enrollData: {
+            data: {
                 studentImage: undefined
             },
             errorsExists: false,
@@ -32,10 +33,11 @@ class EnrollToCoursePage extends Component{
     
     onFileInputChange = (e) => {
         const value = e.target.files[0];
+        // setInputState.call(this,"")
         this.setState((prevState)=>{
             return {
-                enrollData: {
-                    ...prevState.enrollData,
+                data: {
+                    ...prevState.data,
                     studentImage:value
                 }
             }
@@ -45,14 +47,14 @@ class EnrollToCoursePage extends Component{
     
     onInputChange = (e)=>{
         const name = e.target.id;
-        const value = !(this.state.enrollData.courseData[name]);
+        const value = !(this.state.data.courseData[name]);
 
         this.setState((prevState)=>{
             return {
-                enrollData: {
-                    ...prevState.enrollData, 
+                data: {
+                    ...prevState.data, 
                     courseData : {
-                        ...prevState.enrollData.courseData,
+                        ...prevState.data.courseData,
                         [name] : value
                     }
                  }
@@ -86,21 +88,33 @@ class EnrollToCoursePage extends Component{
     }
 
     
-    applyAuthentication(enrollData){
-        console.log(enrollData)
-        const { courseData, studentImage } = enrollData
-        let courseDataError = true
+    applyAuthentication(){
+        const data = this.state.data;
 
-        for( const key in courseData){
-            if(courseData[key]){ courseDataError = false}
-        }
-
-        if(courseDataError){
-            this.setErrors({courseError: "Atleast Select one course"})
-        }
-        if(studentImage === undefined){
-            this.setErrors({fileError: "Upload a File"})
-        }
+        const { courseData, studentImage } = data
+        return new Promise((resolve,reject)=>{
+            /**
+             * Checking that has student aleast selected 
+             * on course to enroll in
+             */
+            let courseDataError = true
+    
+            for( const key in courseData){
+                if(courseData[key]){ courseDataError = false}
+            }
+    
+            if(courseDataError){
+                this.setErrors({courseError: "Atleast Select one course"})
+            }
+    
+            /**
+             * Checking if file have been uploaded or not
+             */
+            if(studentImage === undefined){
+                this.setErrors({fileError: "Upload a File"})
+            }
+            resolve();
+        })
     }
 
 
@@ -110,76 +124,87 @@ class EnrollToCoursePage extends Component{
     //////////////////////// REQUEST RELATED FUNCTIONS ////////////////////////////
 
 
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-            callback()
+    handleResponse = (responseArray)=>{
+        /**
+         * Array of response if send each for each course
+         * which student option to select 
+         */
+        responseArray.forEach(response => {
+            const { name } = response;
+            const { message , status } = response.result;
+            if(response.status === 200){
+                switch(status){
+                    case 201:
+                        console.log(message)
+                        setInputState.call(this,"messages",name,message)
+                        break;
+                    case 409:
+                        console.log(message)
+                        setInputState.call(this,"messages",name,message)
+                        break
+                    case 400:
+                        this.setErrors({
+                            otherError: message
+                        })
+                        console.log(message)
+                        break;
+                        default:
+                            break
+                        }
             }
-        )
+        })
     }
 
-
-    makeRequest = () =>{
+    makeRequest = (requestUrl) =>{
         let formData = new FormData();
-        const { studentImage, courseData }  = this.state.enrollData;
+        const { studentImage, courseData }  = this.state.data;
 
+        /**
+         * Used formData only because we need to send file 
+         * to server , it cant be dont otherwise
+         */
         formData.append('file', studentImage)
         formData.append("courseData",JSON.stringify(courseData));
         formData.append("roll_no",this.props.students[0].roll_no)
 
-        this.applyAuthentication(this.state.enrollData);
-        this.waitTillStateChange(()=>{    
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/enroll_student',{
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(responseArray => {
-                    responseArray.forEach(response => {
-                        const { name } = response;
-                        const { message , status } = response.result;
-                        if(response.status === 200){
-                            switch(status){
-                                case 201:
-                                    console.log(message)
-                                    this.setState(prevState => ({
-                                        messages: {
-                                            ...prevState.messages,
-                                            [name]: message
-                                        }
-                                    }))
-                                    break;
-                                case 409:
-                                    console.log(message)
-                                    this.setState(prevState => ({
-                                        messages: {
-                                            ...prevState.messages,
-                                            [name]: message
-                                        }
-                                    }))
-                                    break
-                                case 400:
-                                    this.setErrors({
-                                        otherError: message
-                                    })
-                                    console.log(message)
-                                    break;
-                                    default:
-                                        break
-                                    }
-                        }
-                    })
-                })
-            }
-        })
+
+        const options = {
+            method: 'POST',
+            body: formData
+        }
+
+        if(!this.state.errorsExists){
+            fetch(requestUrl,options)
+            .then(response => response.json())
+            .then(responseArray => this.handleResponse(responseArray))
+        }
     }
                     
     onSubmit = (e)=>{
         e.preventDefault();
         
+        /**
+         * FIRST CLEAR ALL ERROR 
+         * AND
+         * APPLY AUTHENTICATION TO CHECK FOR ERRORS
+        */
         this.clearAllErrors();
+        this.applyAuthentication()
+
+        /**
+         * IF THERE IS NO ERRORS ONLY THEN 
+         * MAKE THE REQUEST OTHERWISE DO NOTHING
+         * 
+         * AND 
+         * 
+         * THERE WILL BE SHOWING ERROR ON THE FORM IF ANY EXIST
+        */
+        .then(()=>{
+            console.log("IN")
+            const url = "http://localhost:5000/enroll_student"
+            this.makeRequest(url); 
+        })
         
-        this.makeRequest() 
         
         
     }
@@ -230,10 +255,10 @@ class EnrollToCoursePage extends Component{
                 this.props.courses.forEach(course => {
                     this.setState(prevState => {
                         return {
-                            enrollData: {
-                                ...prevState.enrollData, 
+                            data: {
+                                ...prevState.data, 
                                 courseData : {
-                                    ...prevState.enrollData.courseData,
+                                    ...prevState.data.courseData,
                                     [course.name] : false
                                 }
                                 }
@@ -287,7 +312,7 @@ class EnrollToCoursePage extends Component{
                                                                 type="checkbox"
                                                                 id={name}
                                                                 placeholder=""
-                                                                value={this.state.enrollData[name]}
+                                                                value={this.state.data[name]}
                                                                 onChange={this.onInputChange}
                                                             />
                                                             </div>

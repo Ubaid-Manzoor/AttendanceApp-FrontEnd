@@ -7,13 +7,15 @@ export default function(objName,key,value){
  * key,value : IS THE PAIR WE WANT TO SET IN TO OBJ objName IN THE STATE 
 */
     console.log(this.state);
-    this.setState((prevState)=>{
-        return {
-            [objName]: {
-                ...prevState[objName],
-                [key]:value
+    return new Promise((resolve,reject)=>{
+        this.setState((prevState)=>{
+            return {
+                [objName]: {
+                    ...prevState[objName],
+                    [key]:value
+                }
             }
-        }
+        },resolve)
     })
 }
 
