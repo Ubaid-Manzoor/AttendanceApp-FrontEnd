@@ -2,14 +2,13 @@ import React , { Component } from 'react'
 import {connect} from 'react-redux'
 import { Redirect } from 'react-router-dom';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
-
-// import Cookies from 'universal-cookie';
 import { setUser } from '../../actions/user'
-import "./LoginPage.scss";
-// import {startLoginUser} from  "../../actions/user";
 import Cookies from 'universal-cookie';
-// import JwtDecode from 'jwt-decode';
 
+import setInputState from '../../genericFunctions/setInputState';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+
+import "./LoginPage.scss";
 class LoginPage extends Component{
     constructor(props){
         super(props);
@@ -17,7 +16,7 @@ class LoginPage extends Component{
         //////////////////////STATE /////////////////////////////////////
 
         this.state={
-            user_data: {
+            data: {
                 username: "",
                 password: "",
                 remember_me: true
@@ -41,14 +40,8 @@ class LoginPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-        this.setState((prevState)=>{
-            return {
-                user_data: {
-                    ...prevState.user_data,
-                    [name]:value
-                }
-            }
-        })
+
+        setInputState.call(this,"data",name,value);
     }
 
     ////////////////////////////////// INPUT HANDLERS ENDS ///////////////////////////////
@@ -81,27 +74,21 @@ class LoginPage extends Component{
     }
 
 
-    applyAuthentication(user_data){
-        if(user_data.username === ''){
-            this.setErrors({username: "Fill the box"})
-        }else if(user_data.password === ''){
-            this.setErrors({password: "Fill the box"})
-        }
+    applyAuthentication(){
+        const data = this.state.data;
+        return new Promise((resolve,reject)=>{
+            if(data.username === ''){
+                this.setErrors({username: "Fill the box"})
+            }
+            if(data.password === ''){
+                this.setErrors({password: "Fill the box"})
+            }
+            resolve();
+        })
     }
 
     ///////////////////////ERROR HANDLERS END/////////////////////////////////////
 
-
-    /////////////////////SETSTATE CALLBACK/////////////////////////////////
-
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-                callback()
-            }
-        )
-    }
-
-    ////////////////////SETSTATE CALLBACK END//////////////////////////////
 
     setCookies = (username,role) =>{
         const cookies = new Cookies();
@@ -112,60 +99,42 @@ class LoginPage extends Component{
 
     ////////////////////LOGIN HANDLER /////////////////////////////////////
 
-    handleSubmit = (e) => {
-        e.preventDefault()
+    handleResponse = (response)=>{
+        const { message, status } = response.result;
 
-        const login_data = {...this.state.user_data};
-
-        this.clearAllErrors();
-        this.applyAuthentication(login_data)
-
-        this.waitTillStateChange(()=>{
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/login',{
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(login_data)
-                })
-                .then(response => response.json())
-                .then(response => {
-                    console.log(response);
-                    
-                    const { message, status } = response.result;
-
-                    if(response['status'] === 200){
-                        switch(status){
-                            case 200:
-                                const { username,role } = response.result.data;
-
-                                // SET THE COOKIES TO BE USED TO CHECK 
-                                //IF & WHICH USER IF LOGGEDIN 
-                                this.setCookies(username,role);
-
-                                // USED TO RE-RENDER SIDEBAR WHILE LOGIN  
-                                this.props.setUser(response.result.data);
-                                this.props.history.push('/');
-                                break;
-                            case 401:
-                                this.setErrors({usernameOrPassword: message})
-                                break;
-                            case 403:
-                                this.setErrors({usernameOrPassword: message})
-                                break;
-                            default:
-                                console.log("Unknown response")
-                                break;
-                        }
-                    }else if(response.status === 400){
-                        const result = response.result;
-                        console.log(result.message);
-                    }
-                })
+        if(response['status'] === 200){
+            switch(status){
+                case 200:
+                    const { username,role } = response.result.data;
+                    // SET THE COOKIES TO BE USED TO CHECK 
+                    //IF & WHICH USER IF LOGGEDIN 
+                    this.setCookies(username,role);
+                    // USED TO RE-RENDER SIDEBAR WHILE LOGIN  
+                    this.props.setUser(response.result.data);
+                    this.props.history.push('/');
+                    break;
+                case 401:
+                    this.setErrors({usernameOrPassword: message})
+                    break;
+                case 403:
+                    this.setErrors({usernameOrPassword: message})
+                    break;
+                default:
+                    console.log("Unknown response")
+                    break;
             }
-        })
+        }else if(response.status === 400){
+            const result = response.result;
+            console.log(result.message);
+        }
+    }
 
+
+    onSubmit = (e)=>{
+        e.preventDefault();
+
+        const url = "http://localhost:5000/login";
+        handleSubmit.call(this,url);
     }
 
 
@@ -181,7 +150,7 @@ class LoginPage extends Component{
                                 <h1>Account Login</h1>
                             </header>
                             {this.state.errors.usernameOrPassword && <p className="errorMessage">{this.state.errors.usernameOrPassword}</p>}
-                            <form onSubmit={this.handleSubmit}>
+                            <form onSubmit={this.onSubmit}>
                                 <div>
                                     <label      
                                         className="usernameLabel"

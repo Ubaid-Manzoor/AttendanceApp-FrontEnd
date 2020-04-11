@@ -1,6 +1,24 @@
 import React , { Component } from 'react'
-// import { Link } from 'react-router-dom'
+
+import setInputState from '../../genericFunctions/setInputState';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+
 import "./SignUpPage.scss"
+
+
+//*****************************************************************************************
+//*****************************************************************************************
+//*****************************************************************************************
+
+/**
+ * NOT SURE THIS IS FULLY ERROR PRONE CHECK BEFORE 
+ * UPDATING
+ */
+//*****************************************************************************************
+//*****************************************************************************************
+//*****************************************************************************************
+
+
 
 class SignUpPage extends Component{
     constructor(props){
@@ -8,7 +26,7 @@ class SignUpPage extends Component{
 
         /////////////////////STATE///////////////////////////////
         this.state={
-            signup_data:{
+            data:{
                 username: "username",
                 role: "student",
                 password: "",
@@ -32,14 +50,7 @@ class SignUpPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
-        this.setState((prevState)=>{
-            return {
-                signup_data: {
-                    ...prevState.signup_data,
-                    [name]:value
-                }
-            }
-        })
+        setInputState.call(this,"data",name,value);
     }
 
     ///////////////////////INPUT HANDLERS END//////////////////////////////
@@ -70,89 +81,61 @@ class SignUpPage extends Component{
     }
 
 
-    applyAuthentication(user_data){
-        if(user_data.username === ''){
-            this.setErrors({username: "Fill the box"})
-        }else if(user_data.password === ''){
-            this.setErrors({password: "Fill the box"})
-        }else if(user_data.confirm_password === ''){
-            this.setErrors({confirmPassword: "Fill the box"})
-        }else if(user_data['password'] !== user_data['confirm_password']){
-            this.setErrors({confirmPassword: "password did not match"})
-        }
+    applyAuthentication(){
+        const user_data = this.state.data;
+        return new Promise((resolve,reject)=>{
+            if(user_data.username === ''){
+                this.setErrors({username: "Fill the box"})
+            }
+            if(user_data.password === ''){
+                this.setErrors({password: "Fill the box"})
+            }
+            if(user_data.confirm_password === ''){
+                this.setErrors({confirmPassword: "Fill the box"})
+            }
+            if(user_data['password'] !== user_data['confirm_password']){
+                this.setErrors({confirmPassword: "password did not match"})
+            }
+
+            resolve();
+        })
     }
 
     ///////////////////////ERROR HANDLERS END/////////////////////////////////////
 
 
-    /////////////////////SETSTATE CALLBACK/////////////////////////////////
-
-    waitTillStateChange(callback){
-        this.setState(state => state,()=>{
-                callback()
-            }
-        )
-    }
-
-    ////////////////////SETSTATE CALLBACK END//////////////////////////////
-
-
     ///////////////////////SIGN UP HANDLER////////////////////////////////
 
-    handleSubmit = (e)=>{
-        e.preventDefault();
-        const user_data = {
-            ...this.state.signup_data,
-            confirmed: false            
-        }
-
-
-        this.clearAllErrors();
-
-        this.applyAuthentication(user_data)
-
-        delete user_data.confirm_password
-        
-        this.waitTillStateChange(()=>{
-            // Try Signing Up
-            if(!this.state.errorsExists){
-                fetch('http://localhost:5000/signup',{
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(user_data)
-                })
-                .then(response => response.json())
-                .then((response) =>{
-                    if(response['status'] === 200){
-                        const result = response.result;
-                        switch(result.status){
-                            case 201:
-                                this.props.history.push('/login')
-                                break;
-                            case 409:
-                                this.setErrors({username: result.message})
-                                break;
-                            case 422:
-                                this.setErrors({otherError: result.message})
-                                break;
-                            default:
-                                console.log("Unknown Response!!")
-                                break;
-                        }
-                    }else if(response['status'] === 400){
-                        const result = response.result;
-                        this.setErrors({otherError: result.message})
-                    }
-                })
-                .catch((error)=>{
-                    console.log(error)
-                })
+    handleResponse = (response)=>{
+        if(response['status'] === 200){
+            const result = response.result;
+            switch(result.status){
+                case 201:
+                    this.props.history.push('/login')
+                    break;
+                case 409:
+                    this.setErrors({username: result.message})
+                    break;
+                case 422:
+                    this.setErrors({otherError: result.message})
+                    break;
+                default:
+                    console.log("Unknown Response!!")
+                    break;
             }
-        })
+        }else if(response['status'] === 400){
+            const result = response.result;
+            this.setErrors({otherError: result.message})
+        }
     }
 
+    onSubmit = (e)=>{
+        e.preventDefault();
+
+        const url = 'http://localhost:5000/signup';
+        handleSubmit.call(this,url);
+    }
+    
     /////////////////////SIGNUP HANDLER END////////////////////////////////////
 
     render(){
@@ -164,7 +147,7 @@ class SignUpPage extends Component{
                             <h1>Account SignUp</h1>
                         </header>
                         {this.state.errors.otherError && <span>this.state.errors.otherError</span>}
-                        <form onSubmit={this.handleSubmit}>
+                        <form onSubmit={this.onSubmit}>
                             <div>
                                 <label      
                                     className="usernameLabel"
@@ -177,7 +160,7 @@ class SignUpPage extends Component{
                                         <input 
                                             type="text"
                                             id="username"
-                                            value={this.state.signup_data.username}
+                                            value={this.state.data.username}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -193,7 +176,7 @@ class SignUpPage extends Component{
                                     <select 
                                         name="role"
                                         id="role"
-                                        value={this.state.signup_data.role}
+                                        value={this.state.data.role}
                                         onChange={this.onInputChange}
                                     >
                                         <option value="student">Student</option>
@@ -213,7 +196,7 @@ class SignUpPage extends Component{
                                         <input 
                                             type="password"
                                             id="password"
-                                            value={this.state.signup_data.password}
+                                            value={this.state.data.password}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
@@ -233,7 +216,7 @@ class SignUpPage extends Component{
                                         <input 
                                             type="password"
                                             id="confirm_password"
-                                            value={this.state.signup_data.confirm_password}
+                                            value={this.state.data.confirm_password}
                                             onChange={this.onInputChange}
                                         />
                                     </div>
