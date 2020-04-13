@@ -1,6 +1,6 @@
 import React,{ Component } from 'react';
 import { connect } from 'react-redux';
-// import jwt_decode from 'jwt-decode';
+import { getRoleFromCookie } from '../helperFunction/getCookie'
 
 export default (WrappedComponent) => {
     class Authenticate extends Component {
@@ -23,17 +23,23 @@ export default (WrappedComponent) => {
         }
 
         isAuthenticated(){
-            const role = "admin"
-            // const { role } = jwt_decode(this.props.jwtToken);// We need to decode the Token
-            if(role === "admin"){
+            const role = getRoleFromCookie();
+            console.log("Users Role : ", role);
+            
+            if(role === this.props.requiredRole){
                 return true
-            }else if(this.props.requiredRole === 'admin' && role === 'teacher'){
-                return false
-            }else if(this.props.requiredRole === 'teacher' && role === 'student'){
-                return false
             }else{
-                return true
+                return false
             }
+            // if(role === "admin"){
+            //     return true
+            // }else if(this.props.requiredRole === 'admin' && role === 'teacher'){
+            //     return false
+            // }else if(this.props.requiredRole === 'teacher' && role === 'student'){
+            //     return false
+            // }else{
+            //     return true
+            // }
         }
 
         render(){
@@ -44,10 +50,10 @@ export default (WrappedComponent) => {
             )
         }
     }
-    const mapToStateToProps = (state,props)=>({
-        jwtToken:state.jwt
-    })
+    // const mapToStateToProps = (state,props)=>({
+    //     jwtToken:state.jwt
+    // })
 
-    return connect(mapToStateToProps)(Authenticate);
+    return connect()(Authenticate);
 }
 
