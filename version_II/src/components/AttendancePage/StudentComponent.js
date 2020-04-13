@@ -8,9 +8,9 @@ class StudentComponent extends Component {
     render() {
         const { roll_no, status} = this.props
         return (
-            <div className={`studentComponent_Body ${status ? "" : "studentComponent_notPresent"}`}>
-                <div className="studentComponent_Container">
-                    <div className="studentComponent_Data">
+            <div className={`Component_Body ${status ? "" : "Component_notPresent"}`}>
+                <div className="Component_Container">
+                    <div className="Component_Data">
                         <h2>
                             {roll_no}
                         </h2>

@@ -28,9 +28,9 @@ class StudentComponent extends Component {
     render() {
         const { username,name, department, semester , isConfirmed} = this.props
         return (
-            <div className={`studentComponent_Body ${isConfirmed ? "" : "studentComponent_notConfirmed"}`}>
-                <div className="studentComponent_Container">
-                    <div className="studentComponent_Data">
+            <div className={`Component_Body ${isConfirmed ? "" : "Component_notConfirmed"}`}>
+                <div className="Component_Container">
+                    <div className="Component_Data">
                         <h2>
                             {username}
                             <span>

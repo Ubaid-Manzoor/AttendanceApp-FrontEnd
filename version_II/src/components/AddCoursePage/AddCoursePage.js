@@ -8,7 +8,7 @@ import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
 
 
-import  './_addCoursePage.scss';
+// import  './_addCoursePage.scss';
 
 class AddCoursePage extends Component{
     constructor(props){

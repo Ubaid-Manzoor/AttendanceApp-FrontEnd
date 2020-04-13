@@ -141,9 +141,9 @@ class SignUpPage extends Component{
 
     render(){
         return (
-            <div className="SignUpMainBody">
-                <div className="SignUpContainer">
-                    <div className="SignUpFormContainer">
+            <div className="MainBody SignUpMainBody">
+                <div className="Container SignUpContainer">
+                    <div className="FormContainer SignUpFormContainer">
                         <header>
                             <h1>Account SignUp</h1>
                         </header>
@@ -241,7 +241,7 @@ class SignUpPage extends Component{
                                 <div>Account Already Exist?</div>   
                             </div>
 
-                            <button className="SignUpButton">
+                            <button className="Button SignUpButton">
                                 SignUp
                             </button>
                         </form>

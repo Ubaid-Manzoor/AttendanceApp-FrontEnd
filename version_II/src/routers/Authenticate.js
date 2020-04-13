@@ -24,22 +24,18 @@ export default (WrappedComponent) => {
 
         isAuthenticated(){
             const role = getRoleFromCookie();
-            console.log("Users Role : ", role);
-            
+
+            /**
+             * Page will be only rendered if role === requiredRole
+             * 
+             * That will make sure Page will not be acessed if the user is not 
+             *the required user
+             */
             if(role === this.props.requiredRole){
                 return true
             }else{
                 return false
             }
-            // if(role === "admin"){
-            //     return true
-            // }else if(this.props.requiredRole === 'admin' && role === 'teacher'){
-            //     return false
-            // }else if(this.props.requiredRole === 'teacher' && role === 'student'){
-            //     return false
-            // }else{
-            //     return true
-            // }
         }
 
         render(){
@@ -50,9 +46,6 @@ export default (WrappedComponent) => {
             )
         }
     }
-    // const mapToStateToProps = (state,props)=>({
-    //     jwtToken:state.jwt
-    // })
 
     return connect()(Authenticate);
 }

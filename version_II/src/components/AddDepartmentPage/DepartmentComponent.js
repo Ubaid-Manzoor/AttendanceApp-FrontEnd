@@ -10,9 +10,9 @@ class DepartmentComponent extends Component {
     render() {
         const { name:departmentName } = this.props
         return (
-            <div className="departmentComponent_Body">
-                <div className="departmentComponent_Container">
-                    <div className="departmentComponent_Data">
+            <div className="Component_Body">
+                <div className="Component_Container">
+                    <div className="Component_Data">
                         <h2>
                             {departmentName}
                         </h2>

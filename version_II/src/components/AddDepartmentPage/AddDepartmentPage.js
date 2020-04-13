@@ -9,7 +9,7 @@ import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
 
 
-import  './_addDepartmentPage.scss';
+// import  './_addDepartmentPage.scss';
 
 class AddDepartmentPage extends Component{
     constructor(props){
@@ -128,9 +128,9 @@ class AddDepartmentPage extends Component{
         const listOfDepartments = this.props.departments;
 
         return (
-            <div className="department_MainBody sidePage">
-                <div className="department_Container">
-                    <div className="department_FormContainer">
+            <div className="MainBody department_MainBody sidePage">
+                <div className="Container department_Container">
+                    <div className="FormContainer department_FormContainer">
                         <header>
                             <h1>Add Department</h1>
                         </header>
@@ -163,11 +163,11 @@ class AddDepartmentPage extends Component{
                         </form>
                     </div>
                 </div>
-                    <div className="teacher_ListBlock">
+                    <div className="ListBlock">
                         <header>
                             <h2> All Department </h2>
                         </header>
-                        <div className="teacher_MainContainer">
+                        <div className="MainContainer">
                             <ol>
                                 {
                                     !!listOfDepartments &&

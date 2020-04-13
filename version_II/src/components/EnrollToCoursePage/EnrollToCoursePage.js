@@ -6,7 +6,7 @@ import getAndSetCourses from '../../actions/courses';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 import setInputState from '../../genericFunctions/setInputState';
 
-import './_enrollToCoursePage.scss';
+// import './_enrollToCoursePage.scss';
 
 
 class EnrollToCoursePage extends Component{
@@ -290,9 +290,9 @@ class EnrollToCoursePage extends Component{
             )
         }else{
             return (
-                <div className="Enroll_MainBody sidePage">
-                    <div className="Enroll_Container">
-                        <div className="Enroll_FormContainer">
+                <div className="MainBody Enroll_MainBody sidePage">
+                    <div className="Container Enroll_Container">
+                        <div className="FormContainer Enroll_FormContainer">
                             <header>
                                 <h1>
                                     Enroll<span>({this.props.students[0].roll_no})</span>

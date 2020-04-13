@@ -8,7 +8,7 @@ import StudentComponent from './StudentComponent';
 
 import setInputState from '../../genericFunctions/setInputState';
 
-import './_attendancePage.scss';
+// import './_attendancePage.scss';
 
 
 /**
@@ -380,7 +380,7 @@ class AttendancePage extends Component{
                         </form>
                     </div>
                 </div>
-                <div className="student_ListBlock">
+                <div className="ListBlock">
                 <header>
                     <h2> All Students </h2>
                 </header>

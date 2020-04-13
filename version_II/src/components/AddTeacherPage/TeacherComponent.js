@@ -20,9 +20,9 @@ class TeacherComponent extends Component {
     render() {
         const { username ,name:teachersName , isConfirmed} = this.props
         return (
-            <div className={`teacherComponent_Body ${isConfirmed ? "" : "teacherComponent_notConfirmed"}`}>
-                <div className="teacherComponent_Container">
-                    <div className="teacherComponent_Data">
+            <div className={`Component_Body ${isConfirmed ? "" : "Component_notConfirmed"}`}>
+                <div className="Component_Container">
+                    <div className="Component_Data">
                         <h2>
                             {teachersName}<span>({username})</span>
                         </h2>

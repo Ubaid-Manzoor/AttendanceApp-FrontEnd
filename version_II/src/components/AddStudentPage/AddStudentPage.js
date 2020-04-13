@@ -2,12 +2,12 @@ import React ,{Component} from 'react';
 import { connect } from 'react-redux';
 import { getAndSetStudents } from '../../actions/students'; 
 
-import './_addStudentPage.scss';
 import StudentComponent from './StudentComponent';
 import { getAndSetDepartments } from '../../actions/department';
 
 import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
+// import './_addStudentPage.scss';
 
 class AddStudentPage extends Component{
     constructor(props){
@@ -175,9 +175,9 @@ class AddStudentPage extends Component{
         const listOfDepartments = this.props.departments;
 
         return (
-            <div className="AddStudent_MainBody sidePage">
-                <div className="AddStudent_Container">
-                    <div className="AddStudent_FormContainer">
+            <div className="MainBody AddStudent_MainBody sidePage">
+                <div className="Container AddStudent_Container">
+                    <div className="FormContainer AddStudent_FormContainer">
                         <header>
                             <h1>Add Student</h1>
                         </header>
@@ -329,11 +329,11 @@ class AddStudentPage extends Component{
                         </form>
                     </div>
                 </div>
-                <div className="student_ListBlock">
+                <div className="ListBlock">
                     <header>
                         <h2> All Students </h2>
                     </header>
-                    <div className="student_MainContainer">
+                    <div className="MainContainer">
                         <ol>
                             {
                                 !!listOfStudents &&

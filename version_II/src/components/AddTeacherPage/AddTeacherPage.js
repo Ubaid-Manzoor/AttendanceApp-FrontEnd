@@ -2,13 +2,13 @@ import React ,{Component} from 'react';
 import { connect } from 'react-redux';
 import { getAndSetTeachers } from '../../actions/teachers'; 
 
-import './_addTeacherPage.scss';
 import TeacherComponent from './TeacherComponent';
 import { getAndSetDepartments } from '../../actions/department';
 
 import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
 
+// import './_addTeacherPage.scss';
 class AddTeacherPage extends Component{
     constructor(props){
         super(props);
@@ -174,9 +174,9 @@ class AddTeacherPage extends Component{
         const listOfDepartments = this.props.departments;
 
         return (
-            <div className="AddTeacher_MainBody sidePage">
-                <div className="AddTeacher_Container">
-                    <div className="AddTeacher_FormContainer">
+            <div className="MainBody AddTeacher_MainBody sidePage">
+                <div className="Container AddTeacher_Container">
+                    <div className="FormContainer AddTeacher_FormContainer">
                         <header>
                             <h1>Add Teacher</h1>
                         </header>
@@ -287,11 +287,11 @@ class AddTeacherPage extends Component{
                         </form>
                     </div>
                 </div>
-                <div className="teacher_ListBlock">
+                <div className="ListBlock">
                     <header>
                         <h2> All Teachers </h2>
                     </header>
-                    <div className="teacher_MainContainer">
+                    <div className="MainContainer">
                         <ol>
                             {
                                 listOfTeachers.map(teacher =>{

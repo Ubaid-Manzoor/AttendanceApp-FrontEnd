@@ -143,9 +143,9 @@ class LoginPage extends Component{
         const loggedIn = !!getUsernameFromCookie();
         if(!loggedIn){
             return (
-                <div className="LoginMainBody">
-                    <div className="LoginContainer">
-                        <div className="LoginFormContainer">
+                <div className="MainBody LoginMainBody">
+                    <div className="Container LoginContainer">
+                        <div className="FormContainer LoginFormContainer">
                             <header>
                                 <h1>Account Login</h1>
                             </header>
@@ -153,7 +153,7 @@ class LoginPage extends Component{
                             <form onSubmit={this.onSubmit}>
                                 <div>
                                     <label      
-                                        className="usernameLabel"
+                                        className="Label"
                                         htmlFor="username"
                                     >
                                         USERNAME
@@ -173,7 +173,7 @@ class LoginPage extends Component{
                                 </div>
                                 <div>
                                     <label 
-                                        className="pwdLabel"
+                                        className="Label"
                                         htmlFor="password"
                                     >
                                         PASSWORD
@@ -207,7 +207,7 @@ class LoginPage extends Component{
                                     <div>Forgot Password?</div>   
                                 </div>
     
-                                <button className="LoginButton">
+                                <button className="Button LoginButton">
                                     Login
                                 </button>
                             </form>
