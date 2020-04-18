@@ -151,7 +151,7 @@ class SignUpPage extends Component{
                         <form onSubmit={this.onSubmit}>
                             <div>
                                 <label      
-                                    className="usernameLabel"
+                                    className="Label"
                                     htmlFor="username"
                                 >
                                     USERNAME
@@ -165,12 +165,12 @@ class SignUpPage extends Component{
                                             onChange={this.onInputChange}
                                         />
                                     </div>
-                                    {this.state.errors.username && <span>{this.state.errors.username}</span>}
+                                    {this.state.errors.username && <span className="errorMessage">{this.state.errors.username}</span>}
 
                                 </div>
                             </div>
                             <div>
-                                <label className="roleLabel">
+                                <label className="Label">
                                     ROLE
                                 </label>
                                 <div className="selectDiv">
@@ -187,7 +187,7 @@ class SignUpPage extends Component{
                             </div>
                             <div>
                                 <label 
-                                    className="pwdLabel"
+                                    className="Label"
                                     htmlFor="password"
                                 >
                                     PASSWORD
@@ -201,13 +201,13 @@ class SignUpPage extends Component{
                                             onChange={this.onInputChange}
                                         />
                                     </div>
-                                    {this.state.errors.password && <span>{this.state.errors.password}</span>}
+                                    {this.state.errors.password && <span className="errorMessage">{this.state.errors.password}</span>}
 
                                 </div>
                             </div>
                             <div>
                                 <label 
-                                    className="pwdLabel"
+                                    className="Label"
                                     htmlFor="confirm_password"
                                 >
                                     CONFIRM PASSWORD
@@ -221,7 +221,7 @@ class SignUpPage extends Component{
                                             onChange={this.onInputChange}
                                         />
                                     </div>
-                                    {this.state.errors.confirmPassword && <span>{this.state.errors.confirmPassword}</span>}
+                                    {this.state.errors.confirmPassword && <span className="errorMessage">{this.state.errors.confirmPassword}</span>}
                                 </div>
                             </div>
                             

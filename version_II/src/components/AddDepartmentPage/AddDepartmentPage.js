@@ -4,12 +4,10 @@ import { getAndSetDepartments } from '../../actions/department';
 
 import DepartmentComponent from './DepartmentComponent';
 
-// import makeRequest  from '../../genericFunctions/makeRequest';
 import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
+import clearMessage from '../../genericFunctions/clearMessage';
 
-
-// import  './_addDepartmentPage.scss';
 
 class AddDepartmentPage extends Component{
     constructor(props){
@@ -87,7 +85,7 @@ class AddDepartmentPage extends Component{
                 console.log(message)
                 this.setState({
                     message
-                })
+                },clearMessage.bind(this,3000))
                 this.setState({message})
                 this.props.setDepartments();
                 break;

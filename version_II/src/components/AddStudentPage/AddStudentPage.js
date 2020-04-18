@@ -7,6 +7,7 @@ import { getAndSetDepartments } from '../../actions/department';
 
 import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
+import clearMessage from '../../genericFunctions/clearMessage';
 // import './_addStudentPage.scss';
 
 class AddStudentPage extends Component{
@@ -88,7 +89,7 @@ class AddStudentPage extends Component{
                 this.setErrors({name: "Fill the box"})
             }
             if(data.roll_no === ''){
-                this.setErrors({name: "Fill the box"})
+                this.setErrors({roll_no: "Fill the box"})
             }
             if(data.password === ''){
                 this.setErrors({password: "Fill the box"})
@@ -115,23 +116,20 @@ class AddStudentPage extends Component{
         if(response.status === 200){
             switch(status){
                 case 201:
-                    console.log(message)
                     this.setState({
                         message
-                    })
+                    },clearMessage.bind(this,3000))
                     this.props.setStudents();
                     break;
                 case 409:
                     this.setErrors({
                         exists:message
                     })
-                    console.log(message)
                     break;
                 case 400:
                     this.setErrors({
                         otherError: message
                     })
-                    console.log(message)
                     break;
                 default:
                     break
@@ -175,9 +173,9 @@ class AddStudentPage extends Component{
         const listOfDepartments = this.props.departments;
 
         return (
-            <div className="MainBody AddStudent_MainBody sidePage">
-                <div className="Container AddStudent_Container">
-                    <div className="FormContainer AddStudent_FormContainer">
+            <div className="MainBody sidePage">
+                <div className="Container">
+                    <div className="FormContainer">
                         <header>
                             <h1>Add Student</h1>
                         </header>

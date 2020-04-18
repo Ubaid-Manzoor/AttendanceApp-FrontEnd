@@ -7,6 +7,7 @@ import { getAndSetDepartments } from '../../actions/department';
 
 import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
+import clearMessage from '../../genericFunctions/clearMessage';
 
 // import './_addTeacherPage.scss';
 class AddTeacherPage extends Component{
@@ -116,7 +117,7 @@ class AddTeacherPage extends Component{
                     console.log(message)
                     this.setState({
                         message
-                    })
+                    },clearMessage.bind(this,3000))
                     this.props.setTeachers();
                     break;
                 case 409:

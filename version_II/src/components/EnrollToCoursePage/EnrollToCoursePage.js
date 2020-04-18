@@ -6,8 +6,7 @@ import getAndSetCourses from '../../actions/courses';
 import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 import setInputState from '../../genericFunctions/setInputState';
 
-// import './_enrollToCoursePage.scss';
-
+import './_enrollToCoursePage.scss';
 
 class EnrollToCoursePage extends Component{
     constructor(props){

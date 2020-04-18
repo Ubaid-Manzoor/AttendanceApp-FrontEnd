@@ -6,9 +6,8 @@ import { getAndSetTeachers } from '../../actions/teachers';
 
 import setInputState from '../../genericFunctions/setInputState';
 import handleSubmit from '../../genericFunctions/handleSubmit';
+import clearMessage from '../../genericFunctions/clearMessage';
 
-
-// import  './_addCoursePage.scss';
 
 class AddCoursePage extends Component{
     constructor(props){
@@ -74,8 +73,9 @@ class AddCoursePage extends Component{
 
 
     setDefaultState = ()=>{
-        const department = this.props.departments[0]['name']
-        const teacherAssigned = this.props.teachers[0]['name']
+        console.log(this.props);
+        const department = this.props.departments ? this.props.departments[0]['name'] : ""
+        const teacherAssigned = this.props.teachers ? this.props.teachers[0]['name'] : ""
         setInputState.call(this,"data","department",department);
         setInputState.call(this,"data","teacherAssigned",teacherAssigned);
     }
@@ -135,7 +135,7 @@ class AddCoursePage extends Component{
                     console.log(message)
                     this.setState({
                         message
-                    })
+                    },clearMessage.bind(this,3000))
                     break;
                 case 409:
                     this.setErrors({

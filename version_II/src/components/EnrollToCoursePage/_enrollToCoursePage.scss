@@ -1,0 +1,18 @@
+.courseCheckboxDiv{
+    display: flex;
+    justify-content: left;
+    div{
+        flex: 3;
+    }
+    div:first-child{
+        flex: 1;
+    }
+    input{
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+    label{
+        font-size: 1.5rem
+    }
+
+}

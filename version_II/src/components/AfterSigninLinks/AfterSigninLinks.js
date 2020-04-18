@@ -25,6 +25,7 @@ class AfterSigninLinks extends Component{
             { userRole === 'student' && 
               <React.Fragment>
                 <Link to="/enroll" className='navigation-item'>Enroll To Course</Link>
+                <Link to="/showAttendance" className='navigation-item'>Show Attendance</Link>
                 {/* <Link to="/attendance" className='navigation-item'>Attendance</Link> */}
               </React.Fragment>
             }

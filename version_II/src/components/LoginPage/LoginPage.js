@@ -168,7 +168,7 @@ class LoginPage extends Component{
                                                 onChange={this.onInputChange}
                                             />
                                         </div>
-                                        {this.state.errors.username && <span>{this.state.errors.username}</span>}
+                                        {this.state.errors.username && <span className="errorMessage">{this.state.errors.username}</span>}
                                     </div>
                                 </div>
                                 <div>
@@ -188,7 +188,7 @@ class LoginPage extends Component{
                                                 onChange={this.onInputChange}
                                             />
                                         </div>
-                                        {this.state.errors.password && <span>{this.state.errors.password}</span>}
+                                        {this.state.errors.password && <span className="errorMessage">{this.state.errors.password}</span>}
                                     </div>
                                 </div>
                                 <div className="LoginFooter">

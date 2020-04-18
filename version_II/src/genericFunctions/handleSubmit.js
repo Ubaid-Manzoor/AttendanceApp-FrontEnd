@@ -9,6 +9,7 @@ export default function(requestUrl){
      */
     this.clearAllErrors();
     this.applyAuthentication()
+    
 
     /**
      * IF THERE IS NO ERRORS ONLY THEN 
@@ -20,6 +21,13 @@ export default function(requestUrl){
      */
     .then(()=>{
         if(!this.state.errorsExists){
+            /**
+             * IF there setTimeOut is set we need to clear it
+             * OTHERWISE 
+             * There will be a Memory Leak
+             */
+            clearTimeout(this.errorTimeOut);
+
             const data = this.state.data;
 
             /**
@@ -43,6 +51,15 @@ export default function(requestUrl){
             makeRequest(requestUrl,filterData)
             .then(response => response.json())
             .then(response => this.handleResponse(response))
+        }else{
+            /**
+             * Errors should not stay on page forever,
+             * So after 3sec of errors are showen on The Page,
+             * I should call clearAllErrors() to clear them 
+             */
+            this.errorTimeOut = setTimeout(()=>{
+                this.clearAllErrors();
+            },3000)
         }
     })
 

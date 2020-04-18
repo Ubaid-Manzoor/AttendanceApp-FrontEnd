@@ -18,6 +18,7 @@ import ShowCoursesPage from '../components/ShowCoursesPage';
 import ShowTeachersPage from '../components/ShowTeachersPage';
 import AddDepartmentPage from '../components/AddDepartmentPage';
 import EnrollToCoursePage from '../components/EnrollToCoursePage';
+import ShowAttendancePage from '../components/showAttendancePage';
 
 
 /**
@@ -48,20 +49,64 @@ class AppRouter extends Component{
         <div className="fullBody">
           <Sidebar />
           <Switch>
-            <Route path="/" component={Dashboard} exact={true} />>
-            <Route path="/login" component={LoginPage} />
-            <Route path="/signup" component={SignUpPage} />
-            <Route path="/help" render={ (routeProps)=>(< AuthHelp requiredRole="teacher" {...routeProps} />) } />
-            <Route path="/attendance" component={ (routeProps)=>(< AuthAttendance requiredRole="teacher" {...routeProps} />) } />
-            <Route path="/message" component={ (routeProps)=>(< AuthMessage requiredRole="admin" {...routeProps} />) } />
-            <Route path="/addTeacher" component={ (routeProps)=>(< AuthAddTeacher requiredRole="admin" {...routeProps} />) } />
-            <Route path="/addStudent" component={ (routeProps)=>(< AuthAddStudent requiredRole="admin" {...routeProps} />) } />
-            <Route path="/addCourse" component={ (routeProps)=>(< AuthAddCourse requiredRole="admin" {...routeProps} />) } />
-            <Route path="/showTeachers" component={ (routeProps)=>(< AuthShowTeachers requiredRole="admin" {...routeProps} />) } />
-            <Route path="/showCourses" component={ (routeProps)=>(< AuthShowCourses requiredRole="admin" {...routeProps} />) } />
-            <Route path="/department" component={ (routeProps)=>(< AuthAddDepartment requiredRole="admin" {...routeProps} />) } />
-            <Route path="/enroll" component={ (routeProps)=>(< AuthEnrollCourse requiredRole="student" {...routeProps} />) } />
-            <Route component={ _404Page }></Route>
+            <Route 
+              path="/" 
+              component={Dashboard} exact={true} />
+            >
+            <Route 
+              path="/login" 
+              component={LoginPage} 
+            />
+            <Route 
+              path="/signup" 
+              component={SignUpPage} />
+            <Route 
+              path="/help" 
+              render={ (routeProps)=>(< AuthHelp requiredRole="teacher" {...routeProps} />) } 
+            />
+            <Route 
+              path="/attendance" 
+              render={ (routeProps)=>(< AuthAttendance requiredRole="teacher" {...routeProps} />) } 
+            />
+            <Route 
+              path="/message" 
+              render={ (routeProps)=>(< AuthMessage requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/addTeacher" 
+              render={ (routeProps)=>(< AuthAddTeacher requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/addStudent" 
+              render={ (routeProps)=>(< AuthAddStudent requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/addCourse" 
+              render={ (routeProps)=>(< AuthAddCourse requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/showTeachers" 
+              render={ (routeProps)=>(< AuthShowTeachers requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/showCourses" 
+              render={ (routeProps)=>(< AuthShowCourses requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/department" 
+              render={ (routeProps)=>(< AuthAddDepartment requiredRole="admin" {...routeProps} />) } 
+            />
+            <Route 
+              path="/enroll" 
+              render={ (routeProps)=>(< AuthEnrollCourse requiredRole="student" {...routeProps} />) } 
+            />
+            <Route
+              path="/showAttendance"
+              component={ShowAttendancePage}
+            />
+            <Route 
+              component={ _404Page } 
+            />
           </Switch>
         </div>
       </BrowserRouter>

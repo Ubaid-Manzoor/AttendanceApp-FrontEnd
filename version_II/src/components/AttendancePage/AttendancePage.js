@@ -7,6 +7,7 @@ import { getUsernameFromCookie } from '../../helperFunction/getCookie';
 import StudentComponent from './StudentComponent';
 
 import setInputState from '../../genericFunctions/setInputState';
+import clearMessage from '../../genericFunctions/clearMessage';
 
 // import './_attendancePage.scss';
 
@@ -100,7 +101,7 @@ class AttendancePage extends Component{
     
     clearAllErrors = ()=>{
         this.setErrors({
-            roll_no: "",
+            fileError: "",
             otherError: ""
         })
         this.setState({errorsExists: false});
@@ -170,7 +171,7 @@ class AttendancePage extends Component{
                     console.log(message)
                     this.setState(prevState => ({
                         messages: message
-                    }))
+                    }),clearMessage.bind(this,3000))
 
                     // DISPLAY ATTENDANCE AFTER IT IS DONE
                     this.setTodaysAttendance()
@@ -231,6 +232,11 @@ class AttendancePage extends Component{
         */
         this.clearAllErrors();
         this.applyAuthentication()
+        .then(()=>{
+            setTimeout(()=>{
+                this.clearAllErrors();
+            },3000)
+        })
         /**
          * IF THERE IS NO ERRORS ONLY THEN 
          * MAKE THE REQUEST OTHERWISE DO NOTHING
@@ -309,9 +315,9 @@ class AttendancePage extends Component{
     render() {
     if(!this.state.isFetching){
         return (
-            <div className="Enroll_MainBody sidePage">
-                <div className="Enroll_Container">
-                    <div className="Enroll_FormContainer">
+            <div className="MainBody sidePage">
+                <div className="Container">
+                    <div className="FormContainer">
                         <header>
                             <h1>Attendance</h1>
                         </header>
@@ -326,9 +332,9 @@ class AttendancePage extends Component{
         )
     }else{
         return (
-            <div className="Enroll_MainBody sidePage">
-                <div className="Enroll_Container">
-                    <div className="Enroll_FormContainer">
+            <div className="MainBody sidePage">
+                <div className="Container">
+                    <div className="FormContainer">
                         <header>
                             <h1>
                                 Attendance
