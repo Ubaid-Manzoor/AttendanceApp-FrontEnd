@@ -45,6 +45,7 @@ class AddStudentPage extends Component{
     onInputChange = (e)=>{
         const value = e.target.value;
         const name = e.target.id;
+        console.log(value,name);
         setInputState.call(this,"data",name,value)
     }
     /////////////////////// INPUT HANDLER ENDS /////////////////////////////////
@@ -162,7 +163,7 @@ class AddStudentPage extends Component{
         */
         this.props.setStudents();
         this.props.setDepartments()
-        .then(()=>this.setDefaultState)
+        .then(()=>{this.setDefaultState()})
     }
 
     ///////////////////// LIFE CYCLE FUNCTION ENDS ////////////////////////////////////////

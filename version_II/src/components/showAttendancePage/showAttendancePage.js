@@ -3,7 +3,11 @@ import { connect } from 'react-redux';
 
 import { getAndSetStudents } from '../../actions/students';
 import { getAndSetTeachers } from '../../actions/teachers';
+import getAndSetAttendance from '../../actions/attendance';
 import getAndSetCourses from '../../actions/courses';
+import handleSubmit from '../../genericFunctions/handleSubmit';
+import clearMessage from '../../genericFunctions/clearMessage';
+import setInputState from '../../genericFunctions/setInputState';
 
 import { getRoleFromCookie, getUsernameFromCookie } from '../../helperFunction/getCookie';
 import './_showAttendancePage.scss';
@@ -12,11 +16,115 @@ class ShowAttendance extends Component{
 
     constructor(){
         super();
-
-        
-
         this.state = {
-            courses: []
+            courses: [],
+            data: {},
+            errors: {},
+            errorsExists : false,
+            status: "notReady"
+        }
+
+    }
+
+    onInputChange = (e)=>{
+        const value = e.target.value;
+        const name = e.target.id;
+
+        /**
+         * We need to make sure table should not render 
+         * until setAttendance is called and done
+         */
+        this.setState({status: "notReady"})
+
+        setInputState.call(this,"data",name,value)
+        .then(()=>{
+            this.props.setAttendance(this.state.data)
+            .then(()=>{
+                this.setState({status: "ready"})
+            })
+        })
+    }
+
+    setErrors = (toUpdate)=>{
+        this.setState((prevState) =>{
+            return {
+                errors:{
+                    ...prevState.errors,
+                    ...toUpdate
+                }
+            }
+        })
+        this.setState({errorsExists: true});
+    }
+
+    clearAllErrors = ()=>{
+        this.setErrors({
+            course: ""
+        })
+        this.setState({errorsExists: false});
+    }
+
+    applyAuthentication(){
+        const data = this.state.data; 
+        return new Promise((resolve, reject)=>{
+            if(data.course === undefined){
+                this.setErrors({course: "Not Enrolled in any Course!"})
+                reject();
+            }else{
+                resolve();
+            }
+        })
+    }
+
+    setDefaultFilters = ()=>{
+        const date = new Date();
+        return new Promise((resolve, reject)=>{
+            this.setState((prevState)=>{
+                const role = getRoleFromCookie();
+                if(role === 'student'){
+                    return {
+                        ...prevState,
+                        data: {
+                            all_or_one: "one",
+                            course: this.state.courses[0],
+                            month: date.getMonth(),
+                            department: this.props.students[0]['department'],
+                            semester: this.props.students[0]['semester'],
+                            roll_no: this.props.students[0]['roll_no'],
+                            role
+                        }
+                    }
+                }else{
+                    console.log("Here");
+                }
+            },resolve)
+        })
+    }
+
+    handleResponse = (response)=>{
+        const {message, data , status } = response.result;
+
+        if(response.status === 200){
+            switch(status){
+                case 200:
+                    // this.setState({
+                    //     message
+                    // },clearMessage.bind(this,3000))
+                    console.log(data);
+                    break;
+                case 409:
+                    this.setErrors({
+                        exists:message
+                    })
+                    break;
+                case 400:
+                    this.setErrors({
+                        otherError: message
+                    })
+                    break;
+                default:
+                    break
+            }
         }
     }
 
@@ -29,16 +137,48 @@ class ShowAttendance extends Component{
             }
             const projection = {
                 courseEnrolled: true,
-                roll_no: true
+                roll_no: true,
+                department: true,
+                semester: true
             }
+
+            /**
+             * Set the Student using Filter and Projection
+             */
             this.props.setStudent(filter, projection)
             .then(()=>{
-                console.log(this.props.students);
+                /**
+                 * Set the Course That Student is EnrolledIn.
+                 */
+                console.log(this.props);
+                const coursesEnrolled = this.props.students[0]['courseEnrolled'] 
+                                                                                ? 
+                                                                                this.props.students[0]['courseEnrolled'] 
+                                                                                : [] 
                 this.setState((prevState)=>{
                     return {
                         ...prevState,
-                        courses : [].concat(this.props.students[0]['courseEnrolled'])
+                        courses : [].concat(coursesEnrolled)
                     }
+                },()=>{
+                    this.setDefaultFilters()
+                    /**
+                     * When Default State is Set ,
+                     * First make sure there is not Error
+                     * Then :-make the request to 
+                     * get the attendance for default filters
+                     */
+                    .then(()=>this.applyAuthentication())
+                    .then(()=>{
+                        this.props.setAttendance(this.state.data)
+                        .then(()=>{
+                            this.setState({status: "ready"})
+                            console.log(this.props.attendance);
+                        })
+                    })
+                    .catch(()=>{
+                        console.log(this.state);
+                    })
                 })
             })
         }else if(usersRole === "teacher"){
@@ -53,10 +193,12 @@ class ShowAttendance extends Component{
                         'April', 'May', 'June', 'July', 
                         'August', 'September', 'October', 
                         'November', 'December'];
+        const attendance = this.props.attendance;
         
         return (
             <React.Fragment>
                 <div className="MainBody SidePage">
+                    {this.state.errors.course && <p className="errorMessage">{this.state.errors.course}</p>}
                     <div className="Container ShowAttendanceContainer">
                         <div className="AttendanceContainer">
                             <header>
@@ -65,19 +207,19 @@ class ShowAttendance extends Component{
                                         <select
                                             id="all_or_one"
                                             name="all_or_one"
-                                            // value=""
-                                            // onChange=""
+                                            value={this.state.data.all_or_one}
+                                            onChange={this.onInputChange}
                                         >
-                                            <option value="One">One</option>
-                                            <option value="All">All</option>
+                                            <option value="one">One</option>
+                                            <option value="all">All</option>
                                         </select>
                                     </div>
                                     <div className="">
                                         <select
                                             id="course"
                                             name="course"
-                                            // value=""
-                                            // onChange=""
+                                            value={this.state.data.course}
+                                            onChange={this.setInputState}
                                         >
                                             {   !!this.state.courses &&
                                                 this.state.courses.map(course => {
@@ -90,28 +232,76 @@ class ShowAttendance extends Component{
                                         <select
                                             id="month"
                                             name="month"
-                                            // value=""
-                                            // onChange=""
+                                            value={this.state.data.month}
+                                            onChange={this.onInputChange}
                                         >
                                             <option value={currentMonth} > {months[currentMonth]} </option>
-                                            <option value={currentMonth - 1} > {months[ (currentMonth - 1 + 12) % 12 ]} </option>
-                                            <option value={currentMonth - 2} > {months[ (currentMonth - 2 + 12) % 12 ]} </option>
-                                            <option value={currentMonth - 3} > {months[ (currentMonth - 3 + 12) % 12 ]} </option>
-                                            <option value={currentMonth - 4} > {months[ (currentMonth - 4 + 12) % 12 ]} </option>
-                                            <option value={currentMonth - 5} > {months[ (currentMonth - 5 + 12) % 12 ]} </option>
+                                            <option value={(currentMonth - 1 + 12) % 12} > {months[ (currentMonth - 1 + 12) % 12 ]} </option>
+                                            <option value={(currentMonth - 2 + 12) % 12} > {months[ (currentMonth - 2 + 12) % 12 ]} </option>
+                                            <option value={(currentMonth - 3 + 12) % 12} > {months[ (currentMonth - 3 + 12) % 12 ]} </option>
+                                            <option value={(currentMonth - 4 + 12) % 12} > {months[ (currentMonth - 4 + 12) % 12 ]} </option>
+                                            <option value={(currentMonth - 5 + 12) % 12} > {months[ (currentMonth - 5 + 12) % 12 ]} </option>
                                         </select>
                                     </div>
                                 </div>
                             </header>
                             <main>
                                 <div className="container">
-                                    {/* <table>
-                                        <tr>
-                                            <th>Roll No</th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    </table> */}
+                                    {
+                                        this.state.data['all_or_one'] === "one" && this.state.status === 'ready'
+
+                                        ?      /**
+                                                    FOR SINGLE STUDENT
+                                                */                                  
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <td> Roll No </td>
+                                                        {
+                                                            attendance[Object.keys(attendance)[0]] && attendance[Object.keys(attendance)[0]].map(data =>{
+                                                                return <td key={data.day}>{data.day}</td>
+                                                            })
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{Object.keys(attendance)[0]}</td>
+                                                        {
+                                                            attendance[Object.keys(attendance)[0]] && attendance[Object.keys(attendance)[0]].map(data =>{
+                                                                return <td key={data.day}>{data.present ? "Present" : ''}</td>
+                                                            })
+                                                        }
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        :   /**
+                                                FOR FULL CLASS
+                                            */
+                                           <table>
+                                                <thead>
+                                                    <tr>
+                                                        <td> Roll No </td>
+                                                        <td> Classes Attended </td>
+                                                        <td> Total Classes </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {
+                                                        Object.keys(attendance).map(roll_no =>{
+                                                            return <tr key={roll_no}>
+                                                                        <td>{roll_no}</td>
+                                                                        <td>{attendance[roll_no]['totalClassesAttended']}</td>
+                                                                        <td>{attendance[roll_no]['totalClasses']}</td>
+                                                                    </tr>
+                                                        })
+                                                    }
+                                                    
+                                                </tbody>
+                                            </table>
+                                    }
+                                    
                                 </div>
                             </main>
                         </div>
@@ -127,7 +317,8 @@ const mapStateToProps = (state)=> {
     return {
         students : state.students,
         teachers : state.teachers,
-        courses : state.courses
+        courses : state.courses,
+        attendance : state.attendance
     }
 }   
 
@@ -135,6 +326,7 @@ const mapDispatchToProps = (dispatch)=>{
     return {
         setStudent : (filter, projection)=> dispatch(getAndSetStudents(filter, projection)),
         setTeacher : (filter, projection)=> dispatch(getAndSetTeachers(filter, projection)),
+        setAttendance : (filters)=> dispatch(getAndSetAttendance(filters)),
         SetCourses : (filter, projection)=> dispatch(getAndSetCourses(filter, projection))
     }
 }

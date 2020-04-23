@@ -4,6 +4,7 @@ import courseReducer from '../reducers/courses';
 import teacherReducer from '../reducers/teachers';
 import studentReducer from '../reducers/students';
 import departmentReducer from '../reducers/department';
+import attendanceReducer from '../reducers/attendance';
 import thunk from 'redux-thunk';
 
 
@@ -14,7 +15,8 @@ export default () => {
       courses: courseReducer,
       teachers: teacherReducer,
       students: studentReducer,
-      departments: departmentReducer
+      departments: departmentReducer,
+      attendance: attendanceReducer
     }),
     applyMiddleware(thunk)
   );
