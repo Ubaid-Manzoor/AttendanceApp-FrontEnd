@@ -1,17 +1,65 @@
+.ShowAttendanceMainPage{
+    padding-top: 0;
+}
+
 .ShowAttendanceContainer{
     /*
         Nullify the effect of generic Container 
     */
     width: auto;
     padding: 0;
-
-
+    border-radius: 0;
+    padding: 1rem;
     /*
         New Css
     */
-
+    background-color: #ebebeb;
+    font-family:'Play', sans-serif;
+    min-height: 100vh;
+    
 }
 
 .AttendanceContainer header{
-    
+    background-color: #333;
+    padding: 1rem;
+
+    .filterDiv{
+        display: flex;
+        div{
+            flex: 1;
+        }
+    }
+    select{
+        width: 95%;
+        padding: 0.5rem 3rem;
+        option{
+            padding: 1rem;
+        }
+    }
+}
+
+.AttendanceContainer main{
+    // background-color: #ccc;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    // margin-top: 3rem;
+    table{
+        color: #ebebeb;
+        background-color: #333;
+        margin: auto;
+        width: 40rem;
+        border-collapse: collapse;
+        thead{
+
+        }
+        tbody{
+        }
+
+        td,th{
+            padding: 2rem 1rem;
+            // min-width: 7rem;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+    }
 }

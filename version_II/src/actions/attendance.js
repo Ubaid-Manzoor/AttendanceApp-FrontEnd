@@ -1,5 +1,3 @@
-import getAndSetCourses from "./courses"
-
 const setAttendance = (attendance)=> ({
     type: 'SET_ATTENDANCE',
     attendance
@@ -10,6 +8,7 @@ const clearAttendance = ()=> ({
 })
 
 const getAndSetAttendance = (filters={}) =>{
+    console.log(filters)
     return (dispatch) => {
         return new Promise((resolve,reject)=>{
             fetch("http://localhost:5000/getAttendance",{
@@ -19,6 +18,7 @@ const getAndSetAttendance = (filters={}) =>{
             .then(response => response.json())
             .then(response => {
                 const { data:attendance } = response['result'];
+                console.log(attendance)
                 dispatch(clearAttendance());
                 dispatch(setAttendance(attendance))
 

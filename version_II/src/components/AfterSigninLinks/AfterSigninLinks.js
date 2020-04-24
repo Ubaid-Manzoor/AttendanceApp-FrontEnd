@@ -33,6 +33,7 @@ class AfterSigninLinks extends Component{
               userRole === 'teacher' &&
               <React.Fragment>
                 <Link to="/attendance" className='navigation-item'>Attendance</Link>
+                <Link to="/showAttendance" className='navigation-item'>Show Attendance</Link>
                 <Link to="/message" className="navigation-item">Message</Link>
               </React.Fragment>
             }

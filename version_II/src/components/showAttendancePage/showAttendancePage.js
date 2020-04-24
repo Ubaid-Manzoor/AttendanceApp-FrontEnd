@@ -34,6 +34,8 @@ class ShowAttendance extends Component{
          * We need to make sure table should not render 
          * until setAttendance is called and done
          */
+
+         console.log(value,name)
         this.setState({status: "notReady"})
 
         setInputState.call(this,"data",name,value)
@@ -95,7 +97,17 @@ class ShowAttendance extends Component{
                         }
                     }
                 }else{
-                    console.log("Here");
+                    return {
+                        ...prevState,
+                        data: {
+                            all_or_one: "all",
+                            course: this.state.courses[0],
+                            month: date.getMonth(),
+                            department: this.props.teachers[0]['department'],
+                            teacherAssigned : this.props.teachers[0]['name'],
+                            role
+                        }
+                    }
                 }
             },resolve)
         })
@@ -150,7 +162,6 @@ class ShowAttendance extends Component{
                 /**
                  * Set the Course That Student is EnrolledIn.
                  */
-                console.log(this.props);
                 const coursesEnrolled = this.props.students[0]['courseEnrolled'] 
                                                                                 ? 
                                                                                 this.props.students[0]['courseEnrolled'] 
@@ -182,7 +193,53 @@ class ShowAttendance extends Component{
                 })
             })
         }else if(usersRole === "teacher"){
-            this.props.setTeacher()
+            const filter = {
+                username : getUsernameFromCookie()
+            }
+            const projection = {
+                courseAssigned: true,
+                department: true,
+                name: true
+            }
+
+            /**
+             * Set the Teacher using Filter and Projection
+             */
+            this.props.setTeacher(filter, projection)
+            .then(()=>{
+                /**
+                 * Set the Course That Teacher is Assigned To.
+                 */
+                const courseAssigned = this.props.teachers[0]['courseAssigned'] 
+                                                                                ? 
+                                                                                this.props.teachers[0]['courseAssigned'] 
+                                                                                : [] 
+                this.setState((prevState)=>{
+                    return {
+                        ...prevState,
+                        courses : [].concat(courseAssigned)
+                    }
+                },()=>{
+                    this.setDefaultFilters()
+                    /**
+                     * When Default State is Set ,
+                     * First make sure there is not Error
+                     * Then :-make the request to 
+                     * get the attendance for default filters
+                     */
+                    .then(()=>this.applyAuthentication())
+                    .then(()=>{
+                        this.props.setAttendance(this.state.data)
+                    //     .then(()=>{
+                    //         this.setState({status: "ready"})
+                    //         console.log(this.props.attendance);
+                    //     })
+                    })
+                    .catch(()=>{
+                        console.log(this.state);
+                    })
+                })
+            })
         }
     }
 
@@ -197,29 +254,32 @@ class ShowAttendance extends Component{
         
         return (
             <React.Fragment>
-                <div className="MainBody SidePage">
+                <div className="MainBody SidePage ShowAttendanceMainPage">
                     {this.state.errors.course && <p className="errorMessage">{this.state.errors.course}</p>}
                     <div className="Container ShowAttendanceContainer">
                         <div className="AttendanceContainer">
                             <header>
                                 <div className="filterDiv">
-                                    <div className="">
-                                        <select
-                                            id="all_or_one"
-                                            name="all_or_one"
-                                            value={this.state.data.all_or_one}
-                                            onChange={this.onInputChange}
-                                        >
-                                            <option value="one">One</option>
-                                            <option value="all">All</option>
-                                        </select>
-                                    </div>
+                                    {
+                                        getRoleFromCookie() === "student" &&
+                                        <div className="">
+                                            <select
+                                                id="all_or_one"
+                                                name="all_or_one"
+                                                value={this.state.data.all_or_one}
+                                                onChange={this.onInputChange}
+                                            >
+                                                <option value="one">One</option>
+                                                <option value="all">All</option>
+                                            </select>
+                                        </div>
+                                    }
                                     <div className="">
                                         <select
                                             id="course"
                                             name="course"
                                             value={this.state.data.course}
-                                            onChange={this.setInputState}
+                                            onChange={this.onInputChange}
                                         >
                                             {   !!this.state.courses &&
                                                 this.state.courses.map(course => {
@@ -256,20 +316,23 @@ class ShowAttendance extends Component{
                                             <table>
                                                 <thead>
                                                     <tr>
-                                                        <td> Roll No </td>
+                                                        <th> Roll No </th>
                                                         {
-                                                            attendance[Object.keys(attendance)[0]] && attendance[Object.keys(attendance)[0]].map(data =>{
-                                                                return <td key={data.day}>{data.day}</td>
+
+                                                            attendance[Object.keys(attendance)[0]] ? attendance[Object.keys(attendance)[0]].map(data =>{
+                                                                return <th key={data.day}>{data.day}</th>
                                                             })
+                                                            :
+                                                            <th>Days...</th>
                                                         }
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td>{Object.keys(attendance)[0]}</td>
+                                                        {Object.keys(attendance)[0] && <td>{Object.keys(attendance)[0]}</td>}
                                                         {
                                                             attendance[Object.keys(attendance)[0]] && attendance[Object.keys(attendance)[0]].map(data =>{
-                                                                return <td key={data.day}>{data.present ? "Present" : ''}</td>
+                                                                return <td key={data.day}>{data.present ? "P" : 'A'}</td>
                                                             })
                                                         }
                                                     </tr>
@@ -282,9 +345,9 @@ class ShowAttendance extends Component{
                                            <table>
                                                 <thead>
                                                     <tr>
-                                                        <td> Roll No </td>
-                                                        <td> Classes Attended </td>
-                                                        <td> Total Classes </td>
+                                                        <th> Roll No </th>
+                                                        <th> Classes Attended </th>
+                                                        <th> Total Classes </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
