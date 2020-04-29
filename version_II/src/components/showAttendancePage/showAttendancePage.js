@@ -230,10 +230,6 @@ class ShowAttendance extends Component{
                     .then(()=>this.applyAuthentication())
                     .then(()=>{
                         this.props.setAttendance(this.state.data)
-                    //     .then(()=>{
-                    //         this.setState({status: "ready"})
-                    //         console.log(this.props.attendance);
-                    //     })
                     })
                     .catch(()=>{
                         console.log(this.state);

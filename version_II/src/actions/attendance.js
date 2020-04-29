@@ -18,10 +18,9 @@ const getAndSetAttendance = (filters={}) =>{
             .then(response => response.json())
             .then(response => {
                 const { data:attendance } = response['result'];
-                console.log(attendance)
+
                 dispatch(clearAttendance());
                 dispatch(setAttendance(attendance))
-
                 resolve();
             })
             .catch((error)=>{
